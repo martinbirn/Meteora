@@ -1,12 +1,15 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.buildKonfig)
 }
 
 kotlin {
@@ -16,7 +19,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -27,12 +30,15 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
-        
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -41,8 +47,23 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.content.negotiation)
+            implementation(libs.ktor.serialization.json)
+            implementation(libs.ktor.logging)
+
+            implementation(libs.kotlinx.coroutines.core)
+
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
+
+            implementation(libs.napier)
         }
     }
 }
@@ -76,5 +97,18 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    commonMainApi(libs.moko.geo)
+    commonMainApi(libs.moko.geo.compose)
+    commonMainApi(libs.moko.permissions.compose)
+    commonMainImplementation(libs.moko.permissions.location)
 }
 
+buildkonfig {
+    packageName = "org.meteora"
+
+    val key: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
+
+    defaultConfigs {
+        buildConfigField(STRING, "WEATHER_API_KEY", key, const = true)
+    }
+}
