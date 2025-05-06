@@ -41,9 +41,9 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
+            implementation(compose.material3)
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -62,6 +62,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.ktor)
 
             implementation(libs.napier)
         }
@@ -92,6 +95,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+compose {
+    resources {
+        packageOfResClass = "org.meteora.presentation.resources"
     }
 }
 
