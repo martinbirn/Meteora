@@ -103,7 +103,7 @@ private fun WeatherScreenContent(
                     //modifier = Modifier.height(intrinsicSize = IntrinsicSize.Max)
                 ) {
                     Text(
-                        text = "${weatherState.weatherInfo.main.temp}°",
+                        text = "${weatherState.weatherInfo.main.temp.toInt()}°",
                         style = MaterialTheme.typography.displayLarge
                     )
                     /*AsyncImage(
@@ -118,11 +118,11 @@ private fun WeatherScreenContent(
                 )
                 Row {
                     Text(
-                        text = "H:${weatherState.weatherInfo.main.tempMax}°",
+                        text = "H:${weatherState.weatherInfo.main.tempMax.toInt()}°",
                         style = MaterialTheme.typography.labelMedium
                     )
                     Text(
-                        text = "L:${weatherState.weatherInfo.main.tempMin}°",
+                        text = "L:${weatherState.weatherInfo.main.tempMin.toInt()}°",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }

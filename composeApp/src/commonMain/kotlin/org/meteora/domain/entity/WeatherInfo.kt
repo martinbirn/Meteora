@@ -13,11 +13,11 @@ data class WeatherInfo(
     )
 
     data class Main(
-        val temp: Int,
+        val temp: Double,
         val feelsLike: Double,
-        val tempMin: Int,
-        val tempMax: Int,
-        val pressure: Int,
+        val tempMin: Double,
+        val tempMax: Double,
+        val pressure: Double,
         val humidity: Int,
     )
 
