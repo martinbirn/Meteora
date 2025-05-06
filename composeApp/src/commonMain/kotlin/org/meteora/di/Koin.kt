@@ -1,7 +1,6 @@
 package org.meteora.di
 
 import dev.icerock.moko.geo.LocationTracker
-import dev.icerock.moko.permissions.PermissionsController
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -11,13 +10,15 @@ import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import org.meteora.data.repository.WeatherRepositoryImpl
 import org.meteora.domain.repository.WeatherRepository
+import org.meteora.logging.AppLogger
 import org.meteora.logging.KtorLogger
-import org.meteora.presentation.screens.weather.WeatherViewModel
-import org.meteora.utils.MeteoraJson
+import org.meteora.presentation.screen.weather.WeatherViewModel
+import org.meteora.util.MeteoraJson
 
 val networkModule = module {
     single {
@@ -45,9 +46,13 @@ val dataModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { (locationTracker: LocationTracker, permissionsController: PermissionsController) ->
-        WeatherViewModel(locationTracker, permissionsController, weatherRepository = get())
+    viewModel { (locationTracker: LocationTracker) ->
+        WeatherViewModel(locationTracker, weatherRepository = get())
     }
+}
+
+val utilsModule = module {
+    singleOf(::AppLogger)
 }
 
 fun initKoin() {
@@ -57,4 +62,4 @@ fun initKoin() {
 }
 
 val KoinApplication.allModules: List<Module>
-    get() = listOf(networkModule, dataModule, viewModelModule)
+    get() = listOf(networkModule, dataModule, viewModelModule, utilsModule)

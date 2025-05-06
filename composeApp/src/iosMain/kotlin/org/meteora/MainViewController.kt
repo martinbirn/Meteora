@@ -1,6 +1,6 @@
 package org.meteora
 
 import androidx.compose.ui.window.ComposeUIViewController
-import org.meteora.presentation.screens.weather.WeatherScreen
+import org.meteora.presentation.screen.App
 
-fun MainViewController() = ComposeUIViewController { WeatherScreen() }
+fun MainViewController() = ComposeUIViewController { App() }

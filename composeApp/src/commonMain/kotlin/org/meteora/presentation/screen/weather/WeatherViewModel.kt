@@ -1,10 +1,10 @@
-package org.meteora.presentation.screens.weather
+package org.meteora.presentation.screen.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
-import dev.icerock.moko.permissions.PermissionsController
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
@@ -23,7 +24,6 @@ import org.meteora.domain.repository.WeatherRepository
 @OptIn(ExperimentalCoroutinesApi::class)
 class WeatherViewModel(
     val locationTracker: LocationTracker,
-    permissionsController: PermissionsController,
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
@@ -41,9 +41,11 @@ class WeatherViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            _refreshTrigger.flatMapLatest { _ ->
+            _refreshTrigger.drop(1).flatMapLatest {
+                Napier.d("_refreshTrigger triggered: $it")
                 locationTracker.getLocationsFlow().take(1)
             }.collect { location ->
+                Napier.d("_refreshTrigger collected: $location")
                 fetchWeather(location.latitude, location.longitude)
             }
         }
@@ -56,11 +58,12 @@ class WeatherViewModel(
             _state.update { state ->
                 state.copy(weatherState = WeatherState.Content(weatherInfo))
             }
-        }.onFailure { error ->
+        }.onFailure { ex ->
+            Napier.e(message = ex.message.orEmpty(), throwable = ex)
             _state.update { state ->
                 state.copy(
-                    weatherState = WeatherState.Error(error),
-                    error = error.message
+                    weatherState = WeatherState.Error(ex),
+                    error = ex.message
                 )
             }
         }
@@ -73,11 +76,10 @@ class WeatherViewModel(
     suspend fun startTracking() {
         try {
             locationTracker.startTracking()
-        } catch (exc: Throwable) {
+        } catch (ex: Throwable) {
+            Napier.e(message = ex.message.orEmpty(), throwable = ex)
             _state.update {
-                it.copy(
-                    textLocation = exc.toString(),
-                )
+                it.copy(textLocation = ex.toString())
             }
         }
     }

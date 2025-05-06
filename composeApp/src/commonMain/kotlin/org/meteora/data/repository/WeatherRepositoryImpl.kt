@@ -32,7 +32,7 @@ class WeatherRepositoryImpl(
                             "temperature_2m,apparent_temperature,precipitation,relative_humidity_2m,pressure_msl"
                         )
                         parameter("timezone", "auto")
-                        parameter("forecast_days", 1)
+                        parameter("forecast_days", 7)
                         parameter("timeformat", "unixtime")
                     }
                 }
@@ -44,7 +44,7 @@ class WeatherRepositoryImpl(
                 val locationResult = locationDeferred.await()
 
                 if (weatherResponse.status != HttpStatusCode.OK) {
-                    return@coroutineScope Result.failure(Throwable("getWeather2: ${weatherResponse.status.description}"))
+                    return@coroutineScope Result.failure(Throwable("getWeather: ${weatherResponse.status.description}"))
                 }
                 locationResult.onFailure {
                     return@coroutineScope Result.failure(it)

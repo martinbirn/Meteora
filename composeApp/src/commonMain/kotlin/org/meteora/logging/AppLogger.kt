@@ -2,6 +2,8 @@
 
 package org.meteora.logging
 
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -17,7 +19,7 @@ class AppLogger {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun setup() {
-        //Napier.base(DebugAntilog())
+        Napier.base(DebugAntilog())
     }
 
 }

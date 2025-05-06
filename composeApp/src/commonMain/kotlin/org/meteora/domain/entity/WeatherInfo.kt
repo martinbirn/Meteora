@@ -1,9 +1,13 @@
 package org.meteora.domain.entity
 
+typealias WeatherCode = Int
+
 data class WeatherInfo(
     val location: Location,
     val main: Main,
-    val weather: Weather?,
+    val weatherCode: WeatherCode,
+    val dailies: List<DailyWeatherInfo>,
+    val hourlies: List<HourlyWeatherInfo>
 ) {
     data class Location(
         val lat: Double,
@@ -24,6 +28,23 @@ data class WeatherInfo(
     data class Weather(
         val main: String,
         val description: String,
-        val icon: String
+        val icon: String,
     )
 }
+
+data class DailyWeatherInfo(
+    val date: Long,
+    val tempMax: Double,
+    val tempMin: Double,
+    val weatherCode: Int,
+    val sunrise: Long,
+    val sunset: Long,
+    val hourlies: List<HourlyWeatherInfo> = emptyList()
+)
+
+data class HourlyWeatherInfo(
+    val index: Int,
+    val hour: Int,
+    val temp: Double,
+    val weatherCode: WeatherCode,
+)

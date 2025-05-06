@@ -1,4 +1,4 @@
-package org.meteora.utils
+package org.meteora.util
 
 import kotlinx.serialization.json.Json
 

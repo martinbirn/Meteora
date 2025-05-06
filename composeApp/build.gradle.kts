@@ -57,6 +57,7 @@ kotlin {
             implementation(libs.ktor.logging)
 
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
 
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
@@ -65,6 +66,9 @@ kotlin {
 
             implementation(libs.coil.compose)
             implementation(libs.coil.ktor)
+
+            implementation(libs.haze)
+            implementation(libs.haze.materials)
 
             implementation(libs.napier)
         }
