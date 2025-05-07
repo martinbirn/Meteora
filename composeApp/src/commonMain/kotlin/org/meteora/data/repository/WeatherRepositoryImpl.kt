@@ -25,14 +25,14 @@ class WeatherRepositoryImpl(
                     client.get("https://api.open-meteo.com/v1/forecast") {
                         parameter("latitude", lat)
                         parameter("longitude", lon)
-                        parameter("daily", "temperature_2m_max,temperature_2m_min,sunset,sunrise")
+                        parameter("daily", "temperature_2m_max,temperature_2m_min,sunset,sunrise,uv_index_max")
                         parameter("hourly", "temperature_2m,weather_code,visibility")
                         parameter(
                             "current",
                             "temperature_2m,apparent_temperature,precipitation,relative_humidity_2m,pressure_msl"
                         )
                         parameter("timezone", "auto")
-                        parameter("forecast_days", 7)
+                        parameter("forecast_days", 10)
                         parameter("timeformat", "unixtime")
                     }
                 }

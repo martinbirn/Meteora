@@ -1,6 +1,7 @@
 package org.meteora.presentation.util.preview
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.HourlyWeatherInfo
@@ -21,7 +22,8 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 tempMin = 5.6,
                 tempMax = 13.6,
                 pressure = 1015.6,
-                humidity = 40
+                humidity = 40,
+                uvIndex = 2.5,
             ),
             weatherCode = 0, // Clear sky
             dailies = createSampleDailies(),
@@ -40,7 +42,8 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 tempMin = 4.3,
                 tempMax = 11.5,
                 pressure = 1020.1,
-                humidity = 65
+                humidity = 65,
+                uvIndex = 2.5,
             ),
             weatherCode = 3, // Clouds
             dailies = createSampleDailies(startWeatherCode = 3),
@@ -59,7 +62,8 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 tempMin = 2.9,
                 tempMax = 9.3,
                 pressure = 1018.2,
-                humidity = 78
+                humidity = 78,
+                uvIndex = 2.5,
             ),
             weatherCode = 61, // Rain
             dailies = createSampleDailies(startWeatherCode = 61),
@@ -80,12 +84,13 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             }
 
             DailyWeatherInfo(
-                date = currentTimestamp + (dayIndex * oneDayInSeconds),
+                dayOfWeek = DayOfWeek.entries[dayIndex].name,
                 tempMax = 15.0 - dayIndex * 0.5,
                 tempMin = 5.0 - dayIndex * 0.3,
                 weatherCode = weatherCode,
                 sunrise = currentTimestamp + (dayIndex * oneDayInSeconds) + 21600, // +6 hours
                 sunset = currentTimestamp + (dayIndex * oneDayInSeconds) + 64800,  // +18 hours
+                uvIndex = 0.0,
                 hourlies = createSampleHourlies(
                     startHour = 0,
                     count = 24,

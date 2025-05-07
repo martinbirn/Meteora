@@ -23,6 +23,7 @@ data class WeatherInfo(
         val tempMax: Double,
         val pressure: Double,
         val humidity: Int,
+        val uvIndex: Double,
     )
 
     data class Weather(
@@ -33,12 +34,13 @@ data class WeatherInfo(
 }
 
 data class DailyWeatherInfo(
-    val date: Long,
+    val dayOfWeek: String,
     val tempMax: Double,
     val tempMin: Double,
     val weatherCode: Int,
     val sunrise: Long,
     val sunset: Long,
+    val uvIndex: Double,
     val hourlies: List<HourlyWeatherInfo> = emptyList()
 )
 

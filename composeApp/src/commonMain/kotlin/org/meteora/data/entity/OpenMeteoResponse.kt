@@ -2,6 +2,7 @@ package org.meteora.data.entity
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,6 +10,7 @@ import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
+import org.meteora.presentation.util.formatter.dayOfWeekFormatter
 
 @Serializable
 data class OpenMeteoResponse(
@@ -58,7 +60,8 @@ data class OpenMeteoResponse(
                 tempMin = daily.temperature2mMin.firstOrNull() ?: 0.0,
                 tempMax = daily.temperature2mMax.firstOrNull() ?: 0.0,
                 pressure = current.pressureMsl,
-                humidity = current.relativeHumidity2m
+                humidity = current.relativeHumidity2m,
+                uvIndex = dailyList[0].uvIndex
             ),
             weatherCode = weatherCode,
             dailies = dailyList,
@@ -97,12 +100,15 @@ data class OpenMeteoResponse(
 
                 dailyList.add(
                     DailyWeatherInfo(
-                        date = dayStart,
+                        dayOfWeek = Instant.fromEpochSeconds(dayStart)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            .format(dayOfWeekFormatter),
                         tempMax = daily.temperature2mMax[i],
                         tempMin = daily.temperature2mMin[i],
                         weatherCode = weatherCode,
                         sunrise = daily.sunrise[i],
                         sunset = daily.sunset[i],
+                        uvIndex = if (i < daily.uvIndexMax.size) daily.uvIndexMax[i] else 0.0,
                         hourlies = hourlyDataForDay
                     )
                 )
@@ -188,5 +194,8 @@ data class DailyWeather(
     val sunset: List<Long>,
 
     @SerialName("sunrise")
-    val sunrise: List<Long>
+    val sunrise: List<Long>,
+
+    @SerialName("uv_index_max")
+    val uvIndexMax: List<Double> = emptyList()
 ) 

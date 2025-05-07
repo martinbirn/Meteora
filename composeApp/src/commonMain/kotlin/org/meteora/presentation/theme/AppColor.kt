@@ -35,6 +35,14 @@ object MeteoraColor {
     val StatusRed = Color(0xFFFF4949)
     val StatusGreen = Color(0xFF55E050)
     val Olive = Color(0xFF39330C)
+    val TemperatureTrackBackground = Color(0x59404040)
+    val TemperatureTrackGradientStart = Color(0xFF63D2DC)
+    val TemperatureTrackGradientEnd = Color(0xFFC6D289)
+    val UvLow = Color(0xFF4CAF50)
+    val UvModerate = Color(0xFFFFEB3B)
+    val UvHigh = Color(0xFFFF9800)
+    val UvVeryHigh = Color(0xFFF44336)
+    val UvExtreme = Color(0xFF9C27B0)
 }
 
 val MeteoraMaterialDarkColors = darkColorScheme(

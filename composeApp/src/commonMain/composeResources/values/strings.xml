@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="now">Now</string>
+    <string name="today">Today</string>
+    <string name="ten_day_forecast">10-DAY FORECAST</string>
+    <string name="feels_like">FEELS LIKE</string>
+    <string name="uv_index">UV INDEX</string>
+    <string name="use_sun_protection_until">Use sun protection until %1$s</string>
+    <string name="low">Low</string>
+    <string name="moderate">Moderate</string>
+    <string name="high">High</string>
+    <string name="very_high">Very High</string>
+    <string name="extreme">Extreme</string>
     <string name="clear">Clear</string>
     <string name="clear_sky">Clear sky</string>
     <string name="few_clouds">Few clouds</string>
