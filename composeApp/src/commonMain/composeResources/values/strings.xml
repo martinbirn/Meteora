@@ -5,6 +5,11 @@
     <string name="ten_day_forecast">10-DAY FORECAST</string>
     <string name="feels_like">FEELS LIKE</string>
     <string name="uv_index">UV INDEX</string>
+    <string name="sunset">SUNSET</string>
+    <string name="sunrise_placeholder">Sunrise: %1$s</string>
+    <string name="precipitation">PRECIPITATION</string>
+    <string name="visibility">VISIBILITY</string>
+    <string name="humidity">HUMIDITY</string>
     <string name="use_sun_protection_until">Use sun protection until %1$s</string>
     <string name="low">Low</string>
     <string name="moderate">Moderate</string>

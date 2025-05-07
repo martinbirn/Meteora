@@ -41,9 +41,9 @@ data class OpenMeteoResponse(
         }
         val currentHour = Instant.fromEpochSeconds(current.time)
             .toLocalDateTime(TimeZone.currentSystemDefault()).time.hour
-        val weatherCode = hourly.weatherCode.getOrNull(currentIndex) ?: 0
         val dailyList = toDailyList()
-        val currentDayHourlies = dailyList[0].hourlies.filter { it.hour >= currentHour }.let {
+        val currentDay = dailyList[0]
+        val currentDayHourlies = currentDay.hourlies.filter { it.hour >= currentHour }.let {
             it + dailyList[1].hourlies.take(24 - it.size)
         }
 
@@ -61,9 +61,13 @@ data class OpenMeteoResponse(
                 tempMax = daily.temperature2mMax.firstOrNull() ?: 0.0,
                 pressure = current.pressureMsl,
                 humidity = current.relativeHumidity2m,
-                uvIndex = dailyList[0].uvIndex
+                uvIndex = currentDay.uvIndex
             ),
-            weatherCode = weatherCode,
+            weatherCode = hourly.weatherCode.getOrElse(currentIndex) { 0 },
+            visibility = hourly.visibility.getOrElse(currentIndex) { 0.0 },
+            precipitation = current.precipitation,
+            sunrise = currentDay.sunrise,
+            sunset = currentDay.sunset,
             dailies = dailyList,
             hourlies = currentDayHourlies
         )

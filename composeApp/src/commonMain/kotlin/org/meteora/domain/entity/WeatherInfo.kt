@@ -6,6 +6,10 @@ data class WeatherInfo(
     val location: Location,
     val main: Main,
     val weatherCode: WeatherCode,
+    val visibility: Double,
+    val precipitation: Double,
+    val sunrise: Long,
+    val sunset: Long,
     val dailies: List<DailyWeatherInfo>,
     val hourlies: List<HourlyWeatherInfo>
 ) {

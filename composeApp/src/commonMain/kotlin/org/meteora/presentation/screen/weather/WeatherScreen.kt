@@ -56,33 +56,49 @@ import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.meteora.data.util.calculateSunProgress
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.icon.CalendarIcon
+import org.meteora.presentation.icon.DropletIcon
+import org.meteora.presentation.icon.EyeIcon
 import org.meteora.presentation.icon.SunIcon
+import org.meteora.presentation.icon.SunSetIcon
 import org.meteora.presentation.icon.ThermometerIcon
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.extreme
 import org.meteora.presentation.resources.feels_like
 import org.meteora.presentation.resources.high
+import org.meteora.presentation.resources.humidity
 import org.meteora.presentation.resources.low
 import org.meteora.presentation.resources.moderate
 import org.meteora.presentation.resources.now
+import org.meteora.presentation.resources.precipitation
+import org.meteora.presentation.resources.sunrise_placeholder
+import org.meteora.presentation.resources.sunset
 import org.meteora.presentation.resources.ten_day_forecast
 import org.meteora.presentation.resources.today
 import org.meteora.presentation.resources.use_sun_protection_until
 import org.meteora.presentation.resources.uv_index
 import org.meteora.presentation.resources.very_high
+import org.meteora.presentation.resources.visibility
+import org.meteora.presentation.screen.weather.component.SunPathView
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
 import org.meteora.presentation.util.description
+import org.meteora.presentation.util.formatter.hourMinuteFormatter
 import org.meteora.presentation.util.icon
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 
@@ -193,6 +209,35 @@ private fun WeatherScreenContent(
                         UvIndexCard(
                             uvIndex = weatherState.weatherInfo.main.uvIndex.toInt(),
                             sunProtectionUntil = "16:00",
+                            modifier = Modifier.weight(weight = 1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(height = 8.dp))
+
+                    Row {
+                        SunContent(
+                            sunrise = weatherState.weatherInfo.sunrise,
+                            sunset = weatherState.weatherInfo.sunset,
+                            modifier = Modifier.weight(weight = 1f)
+                        )
+                        Spacer(modifier = Modifier.width(width = 8.dp))
+                        PrecipitationContent(
+                            precipitation = weatherState.weatherInfo.precipitation.toInt(),
+                            modifier = Modifier.weight(weight = 1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(height = 8.dp))
+
+                    Row {
+                        VisibilityContent(
+                            visibility = weatherState.weatherInfo.visibility,
+                            modifier = Modifier.weight(weight = 1f)
+                        )
+                        Spacer(modifier = Modifier.width(width = 8.dp))
+                        HumidityContent(
+                            humidity = weatherState.weatherInfo.main.humidity,
                             modifier = Modifier.weight(weight = 1f)
                         )
                     }
@@ -529,6 +574,175 @@ private fun UvIndexCard(
         Spacer(modifier = Modifier.height(height = 4.dp))
         Text(
             text = stringResource(Res.string.use_sun_protection_until, sunProtectionUntil),
+            style = MaterialTheme.typography.labelLarge.copy(
+                color = MeteoraColor.White
+            )
+        )
+    }
+}
+
+@Composable
+private fun SunContent(
+    sunrise: Long,
+    sunset: Long,
+    modifier: Modifier = Modifier
+) {
+    val sunsetLocalDateTime = remember(sunset) {
+        Instant.fromEpochSeconds(sunset).toLocalDateTime(TimeZone.currentSystemDefault())
+    }
+    val sunriseLocalDateTime = remember(sunrise) {
+        Instant.fromEpochSeconds(sunrise).toLocalDateTime(TimeZone.currentSystemDefault())
+    }
+    SquareContainer(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = SunSetIcon,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = MeteoraColor.White30
+                )
+            )
+            Spacer(modifier = Modifier.width(width = 4.dp))
+            Text(
+                text = stringResource(resource = Res.string.sunset),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MeteoraColor.White30
+                )
+            )
+        }
+        Text(
+            text = sunsetLocalDateTime.time.format(hourMinuteFormatter),
+            style = MaterialTheme.typography.displaySmall
+        )
+        SunPathView(
+            sunProgress = calculateSunProgress(
+                currentTimeSeconds = Clock.System.now().epochSeconds,
+                sunriseSeconds = sunrise,
+                sunsetSeconds = sunset
+            ),
+            modifier = Modifier.weight(weight = 1f)
+        )
+        Spacer(modifier = Modifier.weight(weight = 1f))
+        Text(
+            text = stringResource(
+                Res.string.sunrise_placeholder,
+                sunriseLocalDateTime.time.format(hourMinuteFormatter)
+            ),
+            style = MaterialTheme.typography.labelLarge.copy(
+                color = MeteoraColor.White
+            )
+        )
+    }
+}
+
+@Composable
+private fun PrecipitationContent(
+    precipitation: Int,
+    modifier: Modifier = Modifier
+) {
+    SquareContainer(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = DropletIcon,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = MeteoraColor.White30
+                )
+            )
+            Spacer(modifier = Modifier.width(width = 4.dp))
+            Text(
+                text = stringResource(resource = Res.string.precipitation),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MeteoraColor.White30
+                )
+            )
+        }
+        Spacer(modifier = Modifier.height(height = 12.dp))
+        Text(
+            text = "$precipitation mm",
+            style = MaterialTheme.typography.displaySmall
+        )
+        Text(
+            text = stringResource(Res.string.today),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.weight(weight = 1f))
+        Text(
+            text = "Next expected is 2 mm on Sat",
+            style = MaterialTheme.typography.labelLarge.copy(
+                color = MeteoraColor.White
+            )
+        )
+    }
+}
+
+@Composable
+private fun VisibilityContent(
+    visibility: Double,
+    modifier: Modifier = Modifier
+) {
+    SquareContainer(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = EyeIcon,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = MeteoraColor.White30
+                )
+            )
+            Spacer(modifier = Modifier.width(width = 4.dp))
+            Text(
+                text = stringResource(resource = Res.string.visibility),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MeteoraColor.White30
+                )
+            )
+        }
+        Spacer(modifier = Modifier.height(height = 12.dp))
+        Text(
+            text = if (visibility > 1000) "${(visibility / 1000).toInt()} km" else "${visibility.toInt()} m",
+            style = MaterialTheme.typography.displaySmall
+        )
+        Spacer(modifier = Modifier.weight(weight = 1f))
+        Text(
+            text = "Perfectly clear view.",
+            style = MaterialTheme.typography.labelLarge.copy(
+                color = MeteoraColor.White
+            )
+        )
+    }
+}
+
+@Composable
+private fun HumidityContent(
+    humidity: Int,
+    modifier: Modifier = Modifier
+) {
+    SquareContainer(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = DropletIcon,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = MeteoraColor.White30
+                )
+            )
+            Spacer(modifier = Modifier.width(width = 4.dp))
+            Text(
+                text = stringResource(resource = Res.string.humidity),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MeteoraColor.White30
+                )
+            )
+        }
+        Spacer(modifier = Modifier.height(height = 12.dp))
+        Text(
+            text = "$humidity%",
+            style = MaterialTheme.typography.displaySmall
+        )
+        Spacer(modifier = Modifier.weight(weight = 1f))
+        Text(
+            text = "The dew point is 1° right now",
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MeteoraColor.White
             )

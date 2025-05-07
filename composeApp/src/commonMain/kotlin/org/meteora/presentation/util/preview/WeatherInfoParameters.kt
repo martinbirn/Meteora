@@ -26,8 +26,12 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 uvIndex = 2.5,
             ),
             weatherCode = 0, // Clear sky
+            visibility = 24000.0,
+            precipitation = 2.3,
+            sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
+            sunset = Clock.System.now().toEpochMilliseconds(),
             dailies = createSampleDailies(),
-            hourlies = createSampleHourlies()
+            hourlies = createSampleHourlies(),
         ),
         WeatherInfo(
             location = WeatherInfo.Location(
@@ -46,6 +50,10 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 uvIndex = 2.5,
             ),
             weatherCode = 3, // Clouds
+            visibility = 18000.0,
+            precipitation = 2.3,
+            sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
+            sunset = Clock.System.now().toEpochMilliseconds(),
             dailies = createSampleDailies(startWeatherCode = 3),
             hourlies = createSampleHourlies(startWeatherCode = 3)
         ),
@@ -66,6 +74,10 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
                 uvIndex = 2.5,
             ),
             weatherCode = 61, // Rain
+            visibility = 12000.0,
+            precipitation = 2.3,
+            sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
+            sunset = Clock.System.now().toEpochMilliseconds(),
             dailies = createSampleDailies(startWeatherCode = 61),
             hourlies = createSampleHourlies(startWeatherCode = 61)
         )
