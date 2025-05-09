@@ -25,7 +25,6 @@ import org.meteora.presentation.theme.MeteoraTheme
 
 @Composable
 fun App() {
-    // init block
     val appLogger = koinInject<AppLogger>()
     key(Unit) {
         appLogger.setup()
@@ -59,6 +58,7 @@ fun App() {
                         )
                     )
                 )
+                //.shaderEffect(ShaderOptions.SNOW)
                 .systemBarsPadding()
                 .navigationBarsPadding()
         ) {

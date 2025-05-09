@@ -24,6 +24,7 @@ napier = "2.7.1"
 coil = "3.1.0"
 datetime = "0.6.2"
 haze = "1.6.0-rc02"
+skiko = "0.9.4"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -67,6 +68,8 @@ coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coi
 
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
+
+skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
