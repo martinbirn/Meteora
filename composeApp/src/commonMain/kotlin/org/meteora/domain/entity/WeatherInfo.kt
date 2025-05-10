@@ -1,6 +1,7 @@
 package org.meteora.domain.entity
 
 typealias WeatherCode = Int
+typealias DirectionAngle = Int
 
 data class WeatherInfo(
     val location: Location,
@@ -10,6 +11,9 @@ data class WeatherInfo(
     val precipitation: Double,
     val sunrise: Long,
     val sunset: Long,
+    val windSpeed: Double,
+    val windDirection: DirectionAngle,
+    val windGusts: Double,
     val dailies: List<DailyWeatherInfo>,
     val hourlies: List<HourlyWeatherInfo>
 ) {
@@ -53,4 +57,7 @@ data class HourlyWeatherInfo(
     val hour: Int,
     val temp: Double,
     val weatherCode: WeatherCode,
+    val windSpeed: Double = 0.0,
+    val windDirection: Int = 0,
+    val windGusts: Double = 0.0
 )

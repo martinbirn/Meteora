@@ -30,6 +30,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             precipitation = 2.3,
             sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
             sunset = Clock.System.now().toEpochMilliseconds(),
+            windSpeed = 0.0,
+            windDirection = 0,
+            windGusts = 0.0,
             dailies = createSampleDailies(),
             hourlies = createSampleHourlies(),
         ),
@@ -54,6 +57,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             precipitation = 2.3,
             sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
             sunset = Clock.System.now().toEpochMilliseconds(),
+            windSpeed = 0.0,
+            windDirection = 0,
+            windGusts = 0.0,
             dailies = createSampleDailies(startWeatherCode = 3),
             hourlies = createSampleHourlies(startWeatherCode = 3)
         ),
@@ -78,6 +84,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             precipitation = 2.3,
             sunrise = Clock.System.now().toEpochMilliseconds() - 21600,
             sunset = Clock.System.now().toEpochMilliseconds(),
+            windSpeed = 0.0,
+            windDirection = 0,
+            windGusts = 0.0,
             dailies = createSampleDailies(startWeatherCode = 61),
             hourlies = createSampleHourlies(startWeatherCode = 61)
         )
@@ -117,20 +126,18 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
         count: Int = 24,
         startWeatherCode: Int = 0
     ): List<HourlyWeatherInfo> {
-        return List(count) { hourIndex ->
-            val hour = (startHour + hourIndex) % 24
-            val weatherCode = when (hourIndex) {
-                in 0..2 -> startWeatherCode
-                in 3..5 -> (startWeatherCode + 1) % 99
-                in 6..8 -> (startWeatherCode + 2) % 99
-                else -> (startWeatherCode + hourIndex % 5) % 99
-            }
-
+        val baseTemp = 10.0
+        return List(count) { index ->
+            val hour = (startHour + index) % 24
+            val weatherCodeOffset = index % 3
             HourlyWeatherInfo(
-                index = hourIndex,
+                index = index,
                 hour = hour,
-                temp = 10.0 + (hour % 12) - (hour / 12) * 5, // Temperature curve through the day
-                weatherCode = weatherCode
+                temp = baseTemp + index % 5,
+                weatherCode = (startWeatherCode + weatherCodeOffset) % 99,
+                windSpeed = 5.0 + (index % 10),
+                windDirection = (index * 10) % 360,
+                windGusts = 8.0 + (index % 15)
             )
         }
     }

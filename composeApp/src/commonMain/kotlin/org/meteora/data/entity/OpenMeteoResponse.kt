@@ -68,6 +68,9 @@ data class OpenMeteoResponse(
             precipitation = current.precipitation,
             sunrise = currentDay.sunrise,
             sunset = currentDay.sunset,
+            windSpeed = hourly.windSpeed10m.getOrElse(currentIndex) { 0.0 },
+            windDirection = hourly.windDirection10m.getOrElse(currentIndex) { 0 },
+            windGusts = hourly.windGusts10m.getOrElse(currentIndex) { 0.0 },
             dailies = dailyList,
             hourlies = currentDayHourlies
         )
@@ -98,7 +101,10 @@ data class OpenMeteoResponse(
                         hour = Instant.fromEpochSeconds(hourly.time[index])
                             .toLocalDateTime(TimeZone.currentSystemDefault()).time.hour,
                         temp = hourly.temperature2m[index],
-                        weatherCode = hourly.weatherCode[index]
+                        weatherCode = hourly.weatherCode[index],
+                        windSpeed = hourly.windSpeed10m.getOrElse(index) { 0.0 },
+                        windDirection = hourly.windDirection10m.getOrElse(index) { 0 },
+                        windGusts = hourly.windGusts10m.getOrElse(index) { 0.0 }
                     )
                 }
 
@@ -180,7 +186,16 @@ data class HourlyWeather(
     val weatherCode: List<Int>,
 
     @SerialName("visibility")
-    val visibility: List<Double>
+    val visibility: List<Double>,
+
+    @SerialName("wind_gusts_10m")
+    val windGusts10m: List<Double>,
+
+    @SerialName("wind_direction_10m")
+    val windDirection10m: List<Int>,
+
+    @SerialName("wind_speed_10m")
+    val windSpeed10m: List<Double>
 )
 
 @Serializable

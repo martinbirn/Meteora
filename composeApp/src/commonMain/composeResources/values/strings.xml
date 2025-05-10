@@ -10,6 +10,9 @@
     <string name="precipitation">PRECIPITATION</string>
     <string name="visibility">VISIBILITY</string>
     <string name="humidity">HUMIDITY</string>
+    <string name="wind">wind</string>
+    <string name="gusts">Gusts</string>
+    <string name="direction">Direction</string>
     <string name="use_sun_protection_until">Use sun protection until %1$s</string>
     <string name="low">Low</string>
     <string name="moderate">Moderate</string>

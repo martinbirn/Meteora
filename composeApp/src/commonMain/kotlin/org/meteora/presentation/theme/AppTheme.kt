@@ -34,7 +34,7 @@ data class Dimensions(
 fun MeteoraTheme(
     dimensions: Dimensions = Dimensions(),
     colors: ColorScheme = MeteoraMaterialDarkColors,
-    typography: Typography = MeteoraTypography(),
+    typography: Typography = meteoraTypography,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(LocalDimensions provides dimensions) {

@@ -2,6 +2,7 @@ package org.meteora.presentation.screen.weather
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -68,6 +69,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.meteora.data.util.calculateSunProgress
 import org.meteora.domain.entity.DailyWeatherInfo
+import org.meteora.domain.entity.DirectionAngle
 import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.icon.CalendarIcon
@@ -76,9 +78,12 @@ import org.meteora.presentation.icon.EyeIcon
 import org.meteora.presentation.icon.SunIcon
 import org.meteora.presentation.icon.SunSetIcon
 import org.meteora.presentation.icon.ThermometerIcon
+import org.meteora.presentation.icon.WindIcon
 import org.meteora.presentation.resources.Res
+import org.meteora.presentation.resources.direction
 import org.meteora.presentation.resources.extreme
 import org.meteora.presentation.resources.feels_like
+import org.meteora.presentation.resources.gusts
 import org.meteora.presentation.resources.high
 import org.meteora.presentation.resources.humidity
 import org.meteora.presentation.resources.low
@@ -93,11 +98,14 @@ import org.meteora.presentation.resources.use_sun_protection_until
 import org.meteora.presentation.resources.uv_index
 import org.meteora.presentation.resources.very_high
 import org.meteora.presentation.resources.visibility
+import org.meteora.presentation.resources.wind
 import org.meteora.presentation.screen.weather.component.SunPathView
+import org.meteora.presentation.screen.weather.component.WindCompass
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
 import org.meteora.presentation.util.description
+import org.meteora.presentation.util.directionName
 import org.meteora.presentation.util.formatter.hourMinuteFormatter
 import org.meteora.presentation.util.icon
 import org.meteora.presentation.util.preview.WeatherInfoParameters
@@ -212,6 +220,15 @@ private fun WeatherScreenContent(
                             modifier = Modifier.weight(weight = 1f)
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(height = 8.dp))
+
+                    WindContent(
+                        windSpeed = weatherState.weatherInfo.windSpeed.toInt(),
+                        windDirection = weatherState.weatherInfo.windDirection,
+                        windGusts = weatherState.weatherInfo.windGusts.toInt(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
                     Spacer(modifier = Modifier.height(height = 8.dp))
 
@@ -582,6 +599,106 @@ private fun UvIndexCard(
 }
 
 @Composable
+private fun WindContent(
+    windSpeed: Int,
+    windDirection: DirectionAngle,
+    windGusts: Int,
+    modifier: Modifier = Modifier
+) {
+    BluredContainer(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = WindIcon,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(
+                    color = MeteoraColor.White30
+                )
+            )
+            Spacer(modifier = Modifier.width(width = 4.dp))
+            Text(
+                text = stringResource(resource = Res.string.wind).uppercase(),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    color = MeteoraColor.White30
+                )
+            )
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.fillMaxWidth(fraction = 0.6f)
+            ) {
+                Spacer(modifier = Modifier.weight(weight = 1f))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.wind).replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        },
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        text = "$windSpeed m/s",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = MeteoraColor.White30
+                        )
+                    )
+                }
+
+                HorizontalDivider()
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.gusts),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        text = "$windGusts m/s",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = MeteoraColor.White30
+                        )
+                    )
+                }
+
+                HorizontalDivider()
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(resource = Res.string.direction),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    val directionName = directionName(windDirection)
+                    Text(
+                        text = "$windDirection° $directionName",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            color = MeteoraColor.White30
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(width = 12.dp))
+            WindCompass(
+                windSpeed = windSpeed,
+                windDirection = windDirection,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
 private fun SunContent(
     sunrise: Long,
     sunset: Long,
@@ -756,18 +873,28 @@ private fun SquareContainer(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    BluredContainer(
+        modifier = modifier.aspectRatio(ratio = 1f),
+        content = content
+    )
+}
+
+@OptIn(ExperimentalHazeMaterialsApi::class)
+@Composable
+private fun BluredContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column(
         modifier = modifier
-            .aspectRatio(ratio = 1f)
             .background(color = MeteoraColor.Black30, shape = RoundedCornerShape(size = 12.dp))
             .padding(all = 12.dp)
             .hazeEffect(
                 state = LocalHazeState.current,
                 style = HazeMaterials.ultraThin()
-            )
-    ) {
-        content()
-    }
+            ),
+        content = content
+    )
 }
 
 @Preview

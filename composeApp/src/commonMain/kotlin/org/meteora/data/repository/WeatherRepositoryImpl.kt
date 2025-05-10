@@ -26,7 +26,7 @@ class WeatherRepositoryImpl(
                         parameter("latitude", lat)
                         parameter("longitude", lon)
                         parameter("daily", "temperature_2m_max,temperature_2m_min,sunset,sunrise,uv_index_max")
-                        parameter("hourly", "temperature_2m,weather_code,visibility")
+                        parameter("hourly", "temperature_2m,weather_code,visibility,wind_gusts_10m,wind_direction_10m,wind_speed_10m")
                         parameter(
                             "current",
                             "temperature_2m,apparent_temperature,precipitation,relative_humidity_2m,pressure_msl"
