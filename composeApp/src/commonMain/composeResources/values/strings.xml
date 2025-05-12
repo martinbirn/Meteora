@@ -32,4 +32,7 @@
     <string name="snow">Snow</string>
     <string name="thunderstorm">Thunderstorm</string>
     <string name="unknown">Unknown</string>
+    <string name="weather">Weather</string>
+    <string name="search_location_placeholder">Search for a city or airport</string>
+    <string name="cancel">Cancel</string>
 </resources>

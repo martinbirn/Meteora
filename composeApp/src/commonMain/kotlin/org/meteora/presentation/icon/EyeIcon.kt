@@ -38,7 +38,15 @@ val EyeIcon: ImageVector
                 reflectiveCurveToRelative(3f, 5.5f, 8f, 5.5f)
                 reflectiveCurveTo(16f, 8f, 16f, 8f)
                 moveTo(1.173f, 8f)
-                arcToRelative(13f, 13f, 0f, isMoreThanHalf = false, isPositiveArc = true, 1.66f, -2.043f)
+                arcToRelative(
+                    13f,
+                    13f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = true,
+                    1.66f,
+                    -2.043f
+                )
                 curveTo(4.12f, 4.668f, 5.88f, 3.5f, 8f, 3.5f)
                 reflectiveCurveToRelative(3.879f, 1.168f, 5.168f, 2.457f)
                 arcTo(13f, 13f, 0f, isMoreThanHalf = false, isPositiveArc = true, 14.828f, 8f)
@@ -62,7 +70,15 @@ val EyeIcon: ImageVector
             ) {
                 moveTo(8f, 5.5f)
                 arcToRelative(2.5f, 2.5f, 0f, isMoreThanHalf = true, isPositiveArc = false, 0f, 5f)
-                arcToRelative(2.5f, 2.5f, 0f, isMoreThanHalf = false, isPositiveArc = false, 0f, -5f)
+                arcToRelative(
+                    2.5f,
+                    2.5f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    0f,
+                    -5f
+                )
                 moveTo(4.5f, 8f)
                 arcToRelative(3.5f, 3.5f, 0f, isMoreThanHalf = true, isPositiveArc = true, 7f, 0f)
                 arcToRelative(3.5f, 3.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, -7f, 0f)

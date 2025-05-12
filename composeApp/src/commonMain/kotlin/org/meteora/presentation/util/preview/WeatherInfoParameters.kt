@@ -13,8 +13,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             location = WeatherInfo.Location(
                 lat = 51.1,
                 lon = 17.03,
-                city = "Wrocław",
-                country = "Poland"
+                locality = "Wrocław",
+                country = "Poland",
+                countryCode = "PL",
             ),
             main = WeatherInfo.Main(
                 temp = 13.5,
@@ -40,8 +41,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             location = WeatherInfo.Location(
                 lat = 51.1,
                 lon = 17.03,
-                city = "Wrocław",
-                country = "Poland"
+                locality = "Wrocław",
+                country = "Poland",
+                countryCode = "PL",
             ),
             main = WeatherInfo.Main(
                 temp = 10.2,
@@ -67,8 +69,9 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             location = WeatherInfo.Location(
                 lat = 51.1,
                 lon = 17.03,
-                city = "Wrocław",
-                country = "Poland"
+                locality = "Wrocław",
+                country = "Poland",
+                countryCode = "PL",
             ),
             main = WeatherInfo.Main(
                 temp = 8.7,

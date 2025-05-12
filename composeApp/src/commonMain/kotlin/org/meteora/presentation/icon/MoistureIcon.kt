@@ -51,25 +51,65 @@ val MoistureIcon: ImageVector
                 horizontalLineToRelative(-1.5f)
                 arcToRelative(0.5f, 0.5f, 0f, isMoreThanHalf = false, isPositiveArc = false, 0f, 1f)
                 horizontalLineToRelative(2f)
-                arcToRelative(0.5f, 0.5f, 0f, isMoreThanHalf = false, isPositiveArc = false, 0.5f, -0.5f)
+                arcToRelative(
+                    0.5f,
+                    0.5f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    0.5f,
+                    -0.5f
+                )
                 verticalLineTo(0.5f)
-                arcToRelative(0.5f, 0.5f, 0f, isMoreThanHalf = false, isPositiveArc = false, -0.5f, -0.5f)
+                arcToRelative(
+                    0.5f,
+                    0.5f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    -0.5f,
+                    -0.5f
+                )
                 close()
                 moveTo(7f, 1.5f)
                 lineToRelative(0.364f, -0.343f)
-                arcToRelative(0.5f, 0.5f, 0f, isMoreThanHalf = false, isPositiveArc = false, -0.728f, 0f)
+                arcToRelative(
+                    0.5f,
+                    0.5f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    -0.728f,
+                    0f
+                )
                 lineToRelative(-0.002f, 0.002f)
                 lineToRelative(-0.006f, 0.007f)
                 lineToRelative(-0.022f, 0.023f)
                 lineToRelative(-0.08f, 0.088f)
-                arcToRelative(29f, 29f, 0f, isMoreThanHalf = false, isPositiveArc = false, -1.274f, 1.517f)
+                arcToRelative(
+                    29f,
+                    29f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    -1.274f,
+                    1.517f
+                )
                 curveToRelative(-0.769f, 0.983f, -1.714f, 2.325f, -2.385f, 3.727f)
                 curveTo(2.368f, 7.564f, 2f, 8.682f, 2f, 9.733f)
                 curveTo(2f, 12.614f, 4.212f, 15f, 7f, 15f)
                 reflectiveCurveToRelative(5f, -2.386f, 5f, -5.267f)
                 curveToRelative(0f, -1.05f, -0.368f, -2.169f, -0.867f, -3.212f)
                 curveToRelative(-0.671f, -1.402f, -1.616f, -2.744f, -2.385f, -3.727f)
-                arcToRelative(29f, 29f, 0f, isMoreThanHalf = false, isPositiveArc = false, -1.354f, -1.605f)
+                arcToRelative(
+                    29f,
+                    29f,
+                    0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    -1.354f,
+                    -1.605f
+                )
                 lineToRelative(-0.022f, -0.023f)
                 lineToRelative(-0.006f, -0.007f)
                 lineToRelative(-0.002f, -0.001f)

@@ -12,12 +12,15 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.meteora.data.repository.WeatherRepositoryImpl
 import org.meteora.domain.repository.WeatherRepository
 import org.meteora.logging.AppLogger
 import org.meteora.logging.KtorLogger
-import org.meteora.presentation.screen.weather.WeatherViewModel
+import org.meteora.presentation.screen.locations.LocationsViewModel
+import org.meteora.presentation.screen.locationsearch.LocationSearchViewModel
+import org.meteora.presentation.screen.locationweather.LocationWeatherViewModel
 import org.meteora.util.MeteoraJson
 
 val networkModule = module {
@@ -47,8 +50,10 @@ val dataModule = module {
 
 val viewModelModule = module {
     viewModel { (locationTracker: LocationTracker) ->
-        WeatherViewModel(locationTracker, weatherRepository = get())
+        LocationWeatherViewModel(locationTracker, weatherRepository = get())
     }
+    viewModelOf(::LocationsViewModel)
+    viewModelOf(::LocationSearchViewModel)
 }
 
 val utilsModule = module {

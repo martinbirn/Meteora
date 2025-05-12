@@ -1,4 +1,4 @@
-package org.meteora.presentation.screen.weather.component
+package org.meteora.presentation.component
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

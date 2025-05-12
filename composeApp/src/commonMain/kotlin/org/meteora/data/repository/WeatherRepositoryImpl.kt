@@ -7,7 +7,7 @@ import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.meteora.data.entity.NominatimResponse
+import org.meteora.data.entity.NominatimSearchResponse
 import org.meteora.data.entity.OpenMeteoResponse
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
@@ -25,8 +25,14 @@ class WeatherRepositoryImpl(
                     client.get("https://api.open-meteo.com/v1/forecast") {
                         parameter("latitude", lat)
                         parameter("longitude", lon)
-                        parameter("daily", "temperature_2m_max,temperature_2m_min,sunset,sunrise,uv_index_max")
-                        parameter("hourly", "temperature_2m,weather_code,visibility,wind_gusts_10m,wind_direction_10m,wind_speed_10m")
+                        parameter(
+                            "daily",
+                            "temperature_2m_max,temperature_2m_min,sunset,sunrise,uv_index_max"
+                        )
+                        parameter(
+                            "hourly",
+                            "temperature_2m,weather_code,visibility,wind_gusts_10m,wind_direction_10m,wind_speed_10m"
+                        )
                         parameter(
                             "current",
                             "temperature_2m,apparent_temperature,precipitation,relative_humidity_2m,pressure_msl"
@@ -70,11 +76,33 @@ class WeatherRepositoryImpl(
         }
         when (response.status) {
             HttpStatusCode.OK -> {
-                val body = response.body<NominatimResponse>()
+                val body = response.body<NominatimSearchResponse>()
                 Result.success(body.toDomain())
             }
 
             else -> Result.failure(Throwable("getLocationInfo: ${response.status.description}"))
+        }
+    } catch (ex: CancellationException) {
+        throw ex
+    } catch (ex: Exception) {
+        Result.failure(ex)
+    }
+
+    override suspend fun searchLocations(query: String, limit: Int): Result<List<String>> = try {
+        val response = client.get("https://nominatim.openstreetmap.org/search") {
+            parameter("q", query)
+            parameter("format", "json")
+            parameter("limit", limit)
+            parameter("addressdetails", 1)
+        }
+
+        when (response.status) {
+            HttpStatusCode.OK -> {
+                val searchResults = response.body<List<NominatimSearchResponse>>()
+                Result.success(searchResults.map { it.displayName })
+            }
+
+            else -> Result.failure(Throwable("searchLocations: ${response.status.description}"))
         }
     } catch (ex: CancellationException) {
         throw ex

@@ -20,8 +20,9 @@ data class WeatherInfo(
     data class Location(
         val lat: Double,
         val lon: Double,
-        val city: String,
-        val country: String,
+        val locality: String?,
+        val country: String?,
+        val countryCode: String?,
     )
 
     data class Main(

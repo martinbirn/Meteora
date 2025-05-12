@@ -1,4 +1,4 @@
-package org.meteora.presentation.screen.weather
+package org.meteora.presentation.screen.locationweather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +22,7 @@ import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.repository.WeatherRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class WeatherViewModel(
+class LocationWeatherViewModel(
     val locationTracker: LocationTracker,
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
@@ -39,6 +39,10 @@ class WeatherViewModel(
 
     private val _refreshTrigger = MutableStateFlow(0)
 
+    data class State(
+        val weatherState: LocationWeatherState = LocationWeatherState.Loading,
+    )
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _refreshTrigger.drop(1).flatMapLatest {
@@ -52,19 +56,16 @@ class WeatherViewModel(
     }
 
     private suspend fun fetchWeather(lat: Double, lon: Double) {
-        _state.update { it.copy(weatherState = WeatherState.Loading) }
+        _state.update { it.copy(weatherState = LocationWeatherState.Loading) }
 
         weatherRepository.getWeather(lat = lat, lon = lon).onSuccess { weatherInfo ->
             _state.update { state ->
-                state.copy(weatherState = WeatherState.Content(weatherInfo))
+                state.copy(weatherState = LocationWeatherState.Content(weatherInfo))
             }
         }.onFailure { ex ->
             Napier.e(message = ex.message.orEmpty(), throwable = ex)
-            _state.update { state ->
-                state.copy(
-                    weatherState = WeatherState.Error(ex),
-                    error = ex.message
-                )
+            _state.update {
+                it.copy(weatherState = LocationWeatherState.Error(ex))
             }
         }
     }
@@ -79,7 +80,7 @@ class WeatherViewModel(
         } catch (ex: Throwable) {
             Napier.e(message = ex.message.orEmpty(), throwable = ex)
             _state.update {
-                it.copy(textLocation = ex.toString())
+                it.copy(weatherState = LocationWeatherState.Error(ex))
             }
         }
     }
@@ -87,16 +88,10 @@ class WeatherViewModel(
     fun stopTracking() {
         locationTracker.stopTracking()
     }
-
-    data class State(
-        val weatherState: WeatherState = WeatherState.Loading,
-        val error: String? = null,
-        val textLocation: String = "no data",
-    )
 }
 
-sealed class WeatherState {
-    object Loading : WeatherState()
-    data class Content(val weatherInfo: WeatherInfo) : WeatherState()
-    data class Error(val throwable: Throwable) : WeatherState()
+sealed class LocationWeatherState {
+    object Loading : LocationWeatherState()
+    data class Content(val weatherInfo: WeatherInfo) : LocationWeatherState()
+    data class Error(val throwable: Throwable) : LocationWeatherState()
 }

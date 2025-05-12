@@ -51,8 +51,9 @@ data class OpenMeteoResponse(
             location = WeatherInfo.Location(
                 lat = latitude,
                 lon = longitude,
-                city = locationInfo.city,
-                country = locationInfo.country
+                locality = locationInfo.locality,
+                country = locationInfo.country,
+                countryCode = locationInfo.countryCode
             ),
             main = WeatherInfo.Main(
                 temp = current.temperature2m,

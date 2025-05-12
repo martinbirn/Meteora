@@ -20,7 +20,7 @@ import kotlinx.coroutines.IO
 import org.koin.compose.koinInject
 import org.meteora.logging.AppLogger
 import org.meteora.logging.CoilLogger
-import org.meteora.presentation.screen.weather.WeatherScreen
+import org.meteora.presentation.screen.locationsearch.LocationSearchScreen
 import org.meteora.presentation.theme.MeteoraTheme
 
 @Composable
@@ -62,7 +62,7 @@ fun App() {
                 .systemBarsPadding()
                 .navigationBarsPadding()
         ) {
-            WeatherScreen()
+            LocationSearchScreen()
         }
     }
 }

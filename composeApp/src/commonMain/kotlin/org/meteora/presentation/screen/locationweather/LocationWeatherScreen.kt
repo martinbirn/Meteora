@@ -1,4 +1,4 @@
-package org.meteora.presentation.screen.weather
+package org.meteora.presentation.screen.locationweather
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -72,6 +72,8 @@ import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.DirectionAngle
 import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.WeatherInfo
+import org.meteora.presentation.component.SunPathView
+import org.meteora.presentation.component.WindCompass
 import org.meteora.presentation.icon.CalendarIcon
 import org.meteora.presentation.icon.DropletIcon
 import org.meteora.presentation.icon.EyeIcon
@@ -99,8 +101,6 @@ import org.meteora.presentation.resources.uv_index
 import org.meteora.presentation.resources.very_high
 import org.meteora.presentation.resources.visibility
 import org.meteora.presentation.resources.wind
-import org.meteora.presentation.screen.weather.component.SunPathView
-import org.meteora.presentation.screen.weather.component.WindCompass
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
@@ -111,7 +111,7 @@ import org.meteora.presentation.util.icon
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 
 @Composable
-fun WeatherScreen() {
+fun LocationWeatherScreen() {
     val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
     val permissionsController: PermissionsController = remember(permissionFactory) {
         permissionFactory.createPermissionsController()
@@ -126,7 +126,7 @@ fun WeatherScreen() {
     BindEffect(permissionsController)
     BindLocationTrackerEffect(locationTracker)
 
-    val viewModel: WeatherViewModel = koinViewModel {
+    val viewModel: LocationWeatherViewModel = koinViewModel {
         parametersOf(locationTracker)
     }
 
@@ -148,20 +148,20 @@ fun WeatherScreen() {
         contentAlignment = Alignment.TopCenter
     ) {
         val screenState by viewModel.state.collectAsState()
-        WeatherScreenContent(
+        LocationWeatherScreenContent(
             screenState = screenState
         )
     }
 }
 
 @Composable
-private fun WeatherScreenContent(
-    screenState: WeatherViewModel.State
+private fun LocationWeatherScreenContent(
+    screenState: LocationWeatherViewModel.State
 ) {
     val hazeState = rememberHazeState()
     CompositionLocalProvider(LocalHazeState provides hazeState) {
         when (val weatherState = screenState.weatherState) {
-            is WeatherState.Content -> {
+            is LocationWeatherState.Content -> {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -171,7 +171,7 @@ private fun WeatherScreenContent(
                 ) {
                     Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
                     Text(
-                        text = "${weatherState.weatherInfo.location.city}, ${weatherState.weatherInfo.location.country}",
+                        text = "${weatherState.weatherInfo.location.locality}, ${weatherState.weatherInfo.location.country}",
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
@@ -263,7 +263,7 @@ private fun WeatherScreenContent(
                 }
             }
 
-            is WeatherState.Error -> {
+            is LocationWeatherState.Error -> {
                 Text(
                     text = weatherState.throwable.message.orEmpty(),
                     modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
@@ -271,7 +271,7 @@ private fun WeatherScreenContent(
                 )
             }
 
-            WeatherState.Loading -> {
+            LocationWeatherState.Loading -> {
                 Text(
                     text = "Loading",
                     modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
@@ -899,7 +899,7 @@ private fun BluredContainer(
 
 @Preview
 @Composable
-private fun PreviewWeatherScreenContent(
+private fun PreviewLocationWeatherScreenContent(
     // @PreviewParameter is broken on my AS version (https://youtrack.jetbrains.com/issue/KMT-879)
     // @PreviewParameter(WeatherInfoParameters::class)
     weatherInfo: WeatherInfo = WeatherInfoParameters().values.first()
@@ -922,9 +922,9 @@ private fun PreviewWeatherScreenContent(
                 ),
             contentAlignment = Alignment.TopCenter
         ) {
-            WeatherScreenContent(
-                screenState = WeatherViewModel.State(
-                    weatherState = WeatherState.Content(
+            LocationWeatherScreenContent(
+                screenState = LocationWeatherViewModel.State(
+                    weatherState = LocationWeatherState.Content(
                         weatherInfo = weatherInfo
                     )
                 )

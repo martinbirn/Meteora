@@ -1,0 +1,25 @@
+package org.meteora.presentation.screen.locations
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import org.meteora.domain.entity.WeatherInfoShort
+import org.meteora.domain.repository.WeatherRepository
+
+class LocationsViewModel(
+    private val weatherRepository: WeatherRepository
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(State())
+    val state = _state.asStateFlow()
+
+    data class State(
+        val locationsState: LocationsState = LocationsState.Loading,
+    )
+}
+
+sealed class LocationsState {
+    object Loading : LocationsState()
+    data class Content(val weatherInfo: List<WeatherInfoShort>) : LocationsState()
+    data class Error(val throwable: Throwable) : LocationsState()
+}
