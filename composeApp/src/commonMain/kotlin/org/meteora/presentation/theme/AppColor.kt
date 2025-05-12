@@ -46,8 +46,8 @@ object MeteoraColor {
 }
 
 val MeteoraMaterialDarkColors = darkColorScheme(
-    primary = MeteoraColor.Orange,
-    onPrimary = MeteoraColor.White,
+    primary = MeteoraColor.White,
+    onPrimary = MeteoraColor.Black,
     primaryContainer = MeteoraColor.White50,
     onPrimaryContainer = MeteoraColor.White20,
     secondary = MeteoraColor.White50,

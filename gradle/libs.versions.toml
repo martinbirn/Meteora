@@ -18,13 +18,14 @@ ktor = "3.1.3"
 coroutines = "1.10.2"
 moko-geo = "0.8.0"
 moko-permissions = "0.19.1"
-koin = "4.0.4"
+koin = "4.1.0-Beta11"
 build-konfig = "0.17.1"
 napier = "2.7.1"
 coil = "3.1.0"
 datetime = "0.6.2"
 haze = "1.6.0-rc02"
 skiko = "0.9.4"
+navigation = "2.9.0-beta01"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -70,6 +71,8 @@ haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
+
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 

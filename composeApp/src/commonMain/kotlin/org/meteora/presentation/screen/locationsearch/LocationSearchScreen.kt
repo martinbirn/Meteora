@@ -1,5 +1,11 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package org.meteora.presentation.screen.locationsearch
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,12 +24,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -34,27 +47,33 @@ import org.meteora.presentation.icon.XCircleIcon
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.cancel
 import org.meteora.presentation.resources.search_location_placeholder
-import org.meteora.presentation.resources.weather
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
+import org.meteora.presentation.util.preview.PreviewSharedLayout
 
 @Composable
-fun LocationSearchScreen() {
+fun LocationSearchScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    navigateBack: () -> Unit
+) {
     val viewModel: LocationSearchViewModel = koinViewModel()
 
-    LocationSearchContentScreen(
+    sharedTransitionScope.LocationSearchContentScreen(
+        animatedContentScope = animatedContentScope,
         screenState = viewModel.state.collectAsState(),
         inputState = viewModel.inputText.collectAsState(),
         onSearchInputChanged = viewModel::updateInput,
         onClearInputClicked = viewModel::clearInput,
         onLocationClicked = viewModel::selectLocation,
-        onCancelClicked = viewModel::back
+        onCancelClicked = navigateBack
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LocationSearchContentScreen(
+private fun SharedTransitionScope.LocationSearchContentScreen(
+    animatedContentScope: AnimatedContentScope,
     screenState: State<LocationSearchViewModel.State>,
     inputState: State<String>,
     onSearchInputChanged: (String) -> Unit,
@@ -62,35 +81,33 @@ private fun LocationSearchContentScreen(
     onLocationClicked: (String) -> Unit,
     onCancelClicked: () -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+    DisposableEffect(Unit) {
+        onDispose { focusManager.clearFocus(force = true) }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
-        Text(
-            text = stringResource(resource = Res.string.weather),
-            modifier = Modifier.padding(horizontal = MeteoraTheme.dimen.horizontalPadding),
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(modifier = Modifier.height(height = 4.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             SearchTextField(
                 value = inputState.value,
                 onValueChange = onSearchInputChanged,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = MeteoraTheme.dimen.horizontalPadding),
-                placeholder = stringResource(resource = Res.string.search_location_placeholder),
-                cancelButton = {
-                    Text(
-                        text = stringResource(resource = Res.string.cancel),
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = onCancelClicked
-                            ),
-                        style = MaterialTheme.typography.bodyLarge
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(key = "search-text"),
+                        animatedVisibilityScope = animatedContentScope
                     )
-                },
+                    .weight(1f)
+                    .padding(start = MeteoraTheme.dimen.horizontalPadding),
+                placeholder = stringResource(resource = Res.string.search_location_placeholder),
                 leadingIcon = {
                     Icon(
                         imageVector = SearchIcon,
@@ -114,7 +131,25 @@ private fun LocationSearchContentScreen(
                             tint = MeteoraColor.White50
                         )
                     }
-                }
+                },
+                focusRequester = focusRequester,
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = stringResource(resource = Res.string.cancel),
+                modifier = Modifier
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(key = "cancel-button"),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                    .padding(end = MeteoraTheme.dimen.horizontalPadding)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onCancelClicked
+                    ),
+                style = MaterialTheme.typography.bodyLarge
             )
         }
         Spacer(modifier = Modifier.height(height = 12.dp))
@@ -178,5 +213,37 @@ private fun SearchResultList(
 @Preview
 @Composable
 private fun PreviewLocationSearchContentScreen() {
-
+    MeteoraTheme {
+        val screenState = remember {
+            mutableStateOf(LocationSearchViewModel.State())
+        }
+        val inputState = remember {
+            mutableStateOf("")
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF8780A3),
+                            Color(0xFFaeaabf)
+                        )
+                    )
+                ),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            PreviewSharedLayout {
+                LocationSearchContentScreen(
+                    animatedContentScope = it,
+                    screenState = screenState,
+                    inputState = inputState,
+                    onSearchInputChanged = {},
+                    onClearInputClicked = {},
+                    onLocationClicked = {},
+                    onCancelClicked = {}
+                )
+            }
+        }
+    }
 }

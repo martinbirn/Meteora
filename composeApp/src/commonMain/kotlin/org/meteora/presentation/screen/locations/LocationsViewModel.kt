@@ -16,6 +16,10 @@ class LocationsViewModel(
     data class State(
         val locationsState: LocationsState = LocationsState.Loading,
     )
+
+    fun onSearchClicked() {
+
+    }
 }
 
 sealed class LocationsState {

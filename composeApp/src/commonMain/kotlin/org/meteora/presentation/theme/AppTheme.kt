@@ -2,6 +2,7 @@ package org.meteora.presentation.theme
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -49,7 +50,10 @@ fun MeteoraTheme(
     typography: Typography = meteoraTypography,
     content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(LocalDimensions provides dimensions) {
+    CompositionLocalProvider(
+        LocalDimensions provides dimensions,
+        LocalTextStyle provides typography.bodyLarge
+    ) {
         MaterialTheme(
             content = content,
             colorScheme = colors,

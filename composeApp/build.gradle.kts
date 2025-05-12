@@ -72,6 +72,8 @@ kotlin {
 
             implementation(libs.skiko)
 
+            implementation(libs.navigation.compose)
+
             implementation(libs.napier)
         }
     }
