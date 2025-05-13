@@ -1,5 +1,7 @@
 package org.meteora.domain.entity
 
+import kotlinx.datetime.Clock
+
 typealias WeatherCode = Int
 typealias DirectionAngle = Int
 
@@ -35,11 +37,28 @@ data class WeatherInfo(
         val uvIndex: Double,
     )
 
-    data class Weather(
-        val main: String,
-        val description: String,
-        val icon: String,
-    )
+    fun toShortInfo(key: String): WeatherInfoShort {
+        return WeatherInfoShort(
+            key = key,
+            name = location.locality.orEmpty(),
+            temp = main.temp,
+            tempMin = main.tempMin,
+            tempMax = main.tempMax,
+            weatherCode = weatherCode,
+            lastUpdate = Clock.System.now().toEpochMilliseconds(),
+        )
+    }
+
+    fun toLocationInfo(): LocationInfo {
+        return LocationInfo(
+            latitude = location.lat,
+            longitude = location.lon,
+            locality = location.locality,
+            country = location.country,
+            countryCode = location.countryCode,
+            displayName = location.locality.orEmpty()
+        )
+    }
 }
 
 data class DailyWeatherInfo(

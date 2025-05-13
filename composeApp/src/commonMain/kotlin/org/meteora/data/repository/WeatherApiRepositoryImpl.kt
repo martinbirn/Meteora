@@ -19,7 +19,7 @@ class WeatherApiRepositoryImpl(
 ) : WeatherApiRepository {
 
     override suspend fun getWeather(lat: Double, lon: Double): Result<WeatherInfo> =
-        coroutineScope {
+        coroutineScope { // TODO: check
             try {
                 val weatherDeferred = async {
                     client.get("https://api.open-meteo.com/v1/forecast") {
@@ -43,7 +43,7 @@ class WeatherApiRepositoryImpl(
                     }
                 }
                 val locationDeferred = async {
-                    getLocationInfo(lat, lon)
+                    findLocation(lat, lon)
                 }
 
                 val weatherResponse = weatherDeferred.await()
@@ -68,7 +68,7 @@ class WeatherApiRepositoryImpl(
             }
         }
 
-    override suspend fun getLocationInfo(lat: Double, lon: Double): Result<LocationInfo> = try {
+    override suspend fun findLocation(lat: Double, lon: Double): Result<LocationInfo> = try {
         val response = client.get("https://nominatim.openstreetmap.org/reverse") {
             parameter("lat", lat)
             parameter("lon", lon)

@@ -66,7 +66,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import org.meteora.data.util.calculateSunProgress
 import org.meteora.domain.entity.DailyWeatherInfo
@@ -118,7 +118,7 @@ fun LocationWeatherScreen(
     locationInfo: LocationInfo? = null,
     header: @Composable () -> Unit = {}
 ) {
-    val viewModel: LocationWeatherViewModel = koinViewModel {
+    val viewModel: LocationWeatherViewModel = koinInject {
         parametersOf(locationInfo)
     }
     if (locationInfo == null) {

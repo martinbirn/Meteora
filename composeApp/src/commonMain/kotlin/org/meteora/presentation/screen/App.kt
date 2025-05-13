@@ -106,7 +106,13 @@ fun App() {
                             navigateToLocationSearch = {
                                 keyboardController?.hide()
                                 navController.navigate(SearchLocationDestination)
-                            }
+                            },
+                            navigateToLocationWeather = { locationInfo ->
+                                keyboardController?.hide()
+                                navController.navigate(
+                                    route = LocationWeatherDestination(locationInfo = locationInfo)
+                                )
+                            },
                         )
                     }
                     composable<LocationWeatherDestination>(

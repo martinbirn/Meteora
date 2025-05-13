@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.buildKonfig)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -36,9 +37,11 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.sqldelight.android.driver)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
         commonMain.dependencies {
             implementation(compose.material3)
@@ -74,6 +77,9 @@ kotlin {
 
             implementation(libs.navigation.compose)
 
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
+
             implementation(libs.napier)
         }
     }
@@ -106,6 +112,14 @@ android {
     }
 }
 
+kotlin {
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Framework> {
+            isStatic = false
+        }
+    }
+}
+
 compose {
     resources {
         packageOfResClass = "org.meteora.presentation.resources"
@@ -127,5 +141,13 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(STRING, "WEATHER_API_KEY", key, const = true)
+    }
+}
+
+sqldelight {
+    databases {
+        create("MeteoraDatabase") {
+            packageName.set("org.meteora.cache")
+        }
     }
 }

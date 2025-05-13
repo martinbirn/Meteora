@@ -7,7 +7,6 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.KoinApplication
-import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -39,16 +38,13 @@ val networkModule = module {
                 logger = KtorLogger()
                 level = LogLevel.ALL
             }
-            /*defaultRequest {
-                url("https://api.openweathermap.org/data/2.5")
-            }*/
         }
     }
 }
 
 val dataModule = module {
     single<WeatherApiRepository> { WeatherApiRepositoryImpl(client = get()) }
-    single<WeatherLocalRepository> { WeatherLocalRepositoryImpl() }
+    single<WeatherLocalRepository> { WeatherLocalRepositoryImpl(databaseDriverFactory = get()) }
 }
 
 val viewModelModule = module {
@@ -63,11 +59,6 @@ val utilsModule = module {
     singleOf(::AppLogger)
 }
 
-fun initKoin() {
-    startKoin {
-        modules(allModules)
-    }
-}
-
-val KoinApplication.allModules: List<Module>
+@Suppress("UnusedReceiverParameter")
+val KoinApplication.sharedModules: List<Module>
     get() = listOf(networkModule, dataModule, viewModelModule, utilsModule)

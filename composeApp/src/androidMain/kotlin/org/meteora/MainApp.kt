@@ -1,11 +1,17 @@
 package org.meteora
 
 import android.app.Application
-import org.meteora.di.initKoin
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.meteora.di.databaseModule
+import org.meteora.di.sharedModules
 
 class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        initKoin()
+        startKoin {
+            androidContext(this@MainApp)
+            modules(databaseModule + sharedModules)
+        }
     }
 }

@@ -5,6 +5,6 @@ import org.meteora.domain.entity.WeatherInfo
 
 interface WeatherApiRepository {
     suspend fun getWeather(lat: Double, lon: Double): Result<WeatherInfo>
-    suspend fun getLocationInfo(lat: Double, lon: Double): Result<LocationInfo>
+    suspend fun findLocation(lat: Double, lon: Double): Result<LocationInfo>
     suspend fun searchLocations(query: String, limit: Int = 10): Result<List<LocationInfo>>
 }

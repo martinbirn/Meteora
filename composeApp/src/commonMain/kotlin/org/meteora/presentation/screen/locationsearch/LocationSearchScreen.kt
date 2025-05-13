@@ -245,7 +245,10 @@ private fun SearchResultList(
     onItemClicked: (LocationInfoShort) -> Unit
 ) {
     LazyColumn {
-        items(items.size) { index ->
+        items(
+            count = items.size,
+            key = { index -> items[index].key }
+        ) { index ->
             val item = items[index]
             Text(
                 text = item.displayName,
