@@ -28,8 +28,8 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.compose.koinInject
-import org.meteora.domain.entity.LatLong
-import org.meteora.domain.entity.LatLongNavType
+import org.meteora.domain.entity.LocationInfo
+import org.meteora.domain.entity.LocationInfoNavType
 import org.meteora.logging.AppLogger
 import org.meteora.logging.CoilLogger
 import org.meteora.presentation.screen.locations.LocationsScreen
@@ -104,23 +104,25 @@ fun App() {
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedContentScope = this@composable,
                             navigateToLocationSearch = {
+                                keyboardController?.hide()
                                 navController.navigate(SearchLocationDestination)
                             }
                         )
                     }
                     composable<LocationWeatherDestination>(
-                        typeMap = mapOf(typeOf<LatLong>() to LatLongNavType)
+                        typeMap = mapOf(typeOf<LocationInfo>() to LocationInfoNavType)
                     ) { backStackEntry ->
                         val route = backStackEntry.toRoute<LocationWeatherDestination>()
-                        LocationWeatherScreen(latLong = route.latLong)
+                        LocationWeatherScreen(locationInfo = route.locationInfo)
                     }
                     composable<SearchLocationDestination> {
                         LocationSearchScreen(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedContentScope = this@composable,
-                            onLocationClicked = { location ->
+                            onLocationClicked = { locationInfo ->
+                                keyboardController?.hide()
                                 navController.navigate(
-                                    route = LocationWeatherDestination(latLong = location.latLong)
+                                    route = LocationWeatherDestination(locationInfo = locationInfo)
                                 )
                             },
                             navigateBack = {

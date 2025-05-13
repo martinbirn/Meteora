@@ -72,7 +72,7 @@ import org.meteora.data.util.calculateSunProgress
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.DirectionAngle
 import org.meteora.domain.entity.HourlyWeatherInfo
-import org.meteora.domain.entity.LatLong
+import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.component.SunPathView
 import org.meteora.presentation.component.WindCompass
@@ -114,43 +114,58 @@ import org.meteora.presentation.util.preview.WeatherInfoParameters
 
 @Composable
 fun LocationWeatherScreen(
-    latLong: LatLong? = null
+    modifier: Modifier = Modifier,
+    locationInfo: LocationInfo? = null,
+    header: @Composable () -> Unit = {}
 ) {
-    val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
-    val permissionsController: PermissionsController = remember(permissionFactory) {
-        permissionFactory.createPermissionsController()
-    }
-    val locationTrackerFactory: LocationTrackerFactory = rememberLocationTrackerFactory(
-        LocationTrackerAccuracy.Best
-    )
-    val locationTracker: LocationTracker = remember(locationTrackerFactory) {
-        locationTrackerFactory.createLocationTracker(permissionsController)
-    }
-
-    BindEffect(permissionsController)
-    BindLocationTrackerEffect(locationTracker)
-
     val viewModel: LocationWeatherViewModel = koinViewModel {
-        parametersOf(latLong?.toLatLng(), locationTracker)
+        parametersOf(locationInfo)
+    }
+    if (locationInfo == null) {
+        val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
+        val permissionsController: PermissionsController = remember(permissionFactory) {
+            permissionFactory.createPermissionsController()
+        }
+        val locationTrackerFactory: LocationTrackerFactory = rememberLocationTrackerFactory(
+            LocationTrackerAccuracy.Best
+        )
+        val locationTracker: LocationTracker = remember(locationTrackerFactory) {
+            locationTrackerFactory.createLocationTracker(permissionsController)
+        }
+
+        BindEffect(permissionsController)
+        BindLocationTrackerEffect(locationTracker)
+
+        LaunchedEffect(Unit) {
+            viewModel.startTracking(locationTracker)
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                viewModel.stopTracking()
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
         viewModel.refresh()
-        viewModel.startTracking()
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.stopTracking()
-        }
-    }
-
-    Box(
-        modifier = Modifier
+    Column(
+        modifier = modifier
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF8780A3),
+                        Color(0xFFaeaabf)
+                    )
+                )
+            )
             .padding(horizontal = MeteoraTheme.dimen.horizontalPadding),
-        contentAlignment = Alignment.TopCenter
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        header()
         val screenState by viewModel.state.collectAsState()
         LocationWeatherScreenContent(
             screenState = screenState
@@ -165,6 +180,28 @@ private fun LocationWeatherScreenContent(
     val hazeState = rememberHazeState()
     CompositionLocalProvider(LocalHazeState provides hazeState) {
         when (val weatherState = screenState.weatherState) {
+            is LocationWeatherState.Init -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(state = rememberScrollState())
+                        .hazeSource(hazeState),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
+                    Text(
+                        text = "${weatherState.locationInfo.locality}, ${weatherState.locationInfo.country}",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = "--",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                }
+            }
+
             is LocationWeatherState.Content -> {
                 Column(
                     modifier = Modifier

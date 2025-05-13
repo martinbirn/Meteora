@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.meteora.domain.entity.WeatherInfoShort
-import org.meteora.domain.repository.WeatherRepository
+import org.meteora.domain.repository.WeatherApiRepository
 
 class LocationsViewModel(
-    private val weatherRepository: WeatherRepository
+    private val weatherApiRepository: WeatherApiRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(State())

@@ -9,16 +9,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.meteora.data.entity.NominatimSearchResponse
 import org.meteora.data.entity.OpenMeteoResponse
-import org.meteora.domain.entity.LatLong
 import org.meteora.domain.entity.LocationInfo
-import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.domain.entity.WeatherInfo
-import org.meteora.domain.repository.WeatherRepository
+import org.meteora.domain.repository.WeatherApiRepository
 import kotlin.coroutines.cancellation.CancellationException
 
-class WeatherRepositoryImpl(
+class WeatherApiRepositoryImpl(
     private val client: HttpClient
-) : WeatherRepository {
+) : WeatherApiRepository {
 
     override suspend fun getWeather(lat: Double, lon: Double): Result<WeatherInfo> =
         coroutineScope {
@@ -93,7 +91,7 @@ class WeatherRepositoryImpl(
     override suspend fun searchLocations(
         query: String,
         limit: Int
-    ): Result<List<LocationInfoShort>> = try {
+    ): Result<List<LocationInfo>> = try {
         val response = client.get("https://nominatim.openstreetmap.org/search") {
             parameter("q", query)
             parameter("format", "json")
@@ -104,12 +102,7 @@ class WeatherRepositoryImpl(
         when (response.status) {
             HttpStatusCode.OK -> {
                 val searchResults = response.body<List<NominatimSearchResponse>>()
-                Result.success(searchResults.map {
-                    LocationInfoShort(
-                        displayName = it.displayName,
-                        latLong = LatLong(it.latitude, it.longitude)
-                    )
-                })
+                Result.success(searchResults.map { it.toDomain() })
             }
 
             else -> Result.failure(Throwable("searchLocations: ${response.status.description}"))

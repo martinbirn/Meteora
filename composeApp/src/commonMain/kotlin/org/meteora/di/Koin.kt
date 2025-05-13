@@ -1,7 +1,5 @@
 package org.meteora.di
 
-import dev.icerock.moko.geo.LatLng
-import dev.icerock.moko.geo.LocationTracker
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -15,8 +13,11 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.meteora.data.repository.WeatherRepositoryImpl
-import org.meteora.domain.repository.WeatherRepository
+import org.meteora.data.repository.WeatherApiRepositoryImpl
+import org.meteora.data.repository.WeatherLocalRepositoryImpl
+import org.meteora.domain.entity.LocationInfo
+import org.meteora.domain.repository.WeatherApiRepository
+import org.meteora.domain.repository.WeatherLocalRepository
 import org.meteora.logging.AppLogger
 import org.meteora.logging.KtorLogger
 import org.meteora.presentation.screen.locations.LocationsViewModel
@@ -46,12 +47,13 @@ val networkModule = module {
 }
 
 val dataModule = module {
-    single<WeatherRepository> { WeatherRepositoryImpl(client = get()) }
+    single<WeatherApiRepository> { WeatherApiRepositoryImpl(client = get()) }
+    single<WeatherLocalRepository> { WeatherLocalRepositoryImpl() }
 }
 
 val viewModelModule = module {
-    viewModel { (latLng: LatLng, locationTracker: LocationTracker) ->
-        LocationWeatherViewModel(latLng, locationTracker, weatherRepository = get())
+    viewModel { (locationInfo: LocationInfo) ->
+        LocationWeatherViewModel(locationInfo, weatherApiRepository = get())
     }
     viewModelOf(::LocationsViewModel)
     viewModelOf(::LocationSearchViewModel)
