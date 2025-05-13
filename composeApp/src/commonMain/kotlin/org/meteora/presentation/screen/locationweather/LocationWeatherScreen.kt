@@ -42,6 +42,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -71,6 +72,7 @@ import org.meteora.data.util.calculateSunProgress
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.DirectionAngle
 import org.meteora.domain.entity.HourlyWeatherInfo
+import org.meteora.domain.entity.LatLong
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.component.SunPathView
 import org.meteora.presentation.component.WindCompass
@@ -111,7 +113,9 @@ import org.meteora.presentation.util.icon
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 
 @Composable
-fun LocationWeatherScreen() {
+fun LocationWeatherScreen(
+    latLong: LatLong? = null
+) {
     val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
     val permissionsController: PermissionsController = remember(permissionFactory) {
         permissionFactory.createPermissionsController()
@@ -127,7 +131,7 @@ fun LocationWeatherScreen() {
     BindLocationTrackerEffect(locationTracker)
 
     val viewModel: LocationWeatherViewModel = koinViewModel {
-        parametersOf(locationTracker)
+        parametersOf(latLong?.toLatLng(), locationTracker)
     }
 
     LaunchedEffect(Unit) {
@@ -172,14 +176,17 @@ private fun LocationWeatherScreenContent(
                     Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
                     Text(
                         text = "${weatherState.weatherInfo.location.locality}, ${weatherState.weatherInfo.location.country}",
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = "${weatherState.weatherInfo.main.temp.toInt()}°",
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.displayLarge
                     )
                     Text(
                         text = stringResource(weatherState.weatherInfo.weatherCode.description),
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Row {

@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -35,13 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.icon.MicIcon
 import org.meteora.presentation.icon.SearchIcon
 import org.meteora.presentation.icon.XCircleIcon
 import org.meteora.presentation.resources.Res
@@ -55,6 +53,7 @@ import org.meteora.presentation.util.preview.PreviewSharedLayout
 fun LocationSearchScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
+    onLocationClicked: (LocationInfoShort) -> Unit,
     navigateBack: () -> Unit
 ) {
     val viewModel: LocationSearchViewModel = koinViewModel()
@@ -65,7 +64,7 @@ fun LocationSearchScreen(
         inputState = viewModel.inputText.collectAsState(),
         onSearchInputChanged = viewModel::updateInput,
         onClearInputClicked = viewModel::clearInput,
-        onLocationClicked = viewModel::selectLocation,
+        onLocationClicked = onLocationClicked,
         onCancelClicked = navigateBack
     )
 }
@@ -78,17 +77,13 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
     inputState: State<String>,
     onSearchInputChanged: (String) -> Unit,
     onClearInputClicked: () -> Unit,
-    onLocationClicked: (String) -> Unit,
+    onLocationClicked: (LocationInfoShort) -> Unit,
     onCancelClicked: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-    }
-    DisposableEffect(Unit) {
-        onDispose { focusManager.clearFocus(force = true) }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -101,11 +96,11 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                 value = inputState.value,
                 onValueChange = onSearchInputChanged,
                 modifier = Modifier
+                    .weight(1f)
                     .sharedElement(
                         sharedContentState = rememberSharedContentState(key = "search-text"),
                         animatedVisibilityScope = animatedContentScope
                     )
-                    .weight(1f)
                     .padding(start = MeteoraTheme.dimen.horizontalPadding),
                 placeholder = stringResource(resource = Res.string.search_location_placeholder),
                 leadingIcon = {
@@ -116,14 +111,7 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                     )
                 },
                 trailingIcon = {
-                    if (inputState.value.isEmpty()) {
-                        Icon(
-                            imageVector = MicIcon,
-                            contentDescription = "Microphone",
-                            modifier = Modifier,// TODO: Implement Mic using
-                            tint = MeteoraColor.White50
-                        )
-                    } else {
+                    if (inputState.value.isNotEmpty()) {
                         Icon(
                             imageVector = XCircleIcon,
                             contentDescription = "Clear",
@@ -188,14 +176,14 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
 
 @Composable
 private fun SearchResultList(
-    items: List<String>,
-    onItemClicked: (String) -> Unit
+    items: List<LocationInfoShort>,
+    onItemClicked: (LocationInfoShort) -> Unit
 ) {
     LazyColumn {
         items(items.size) { index ->
             val item = items[index]
             Text(
-                text = item,
+                text = item.displayName,
                 modifier = Modifier
                     .clickable(onClick = { onItemClicked(item) })
                     .fillMaxWidth()

@@ -21,8 +21,8 @@ data class WeatherInfo(
         val lat: Double,
         val lon: Double,
         val locality: String?,
-        val country: String?,
-        val countryCode: String?,
+        val country: String,
+        val countryCode: String,
     )
 
     data class Main(

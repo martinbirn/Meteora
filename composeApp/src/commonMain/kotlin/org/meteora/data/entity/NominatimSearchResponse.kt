@@ -2,18 +2,16 @@ package org.meteora.data.entity
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.meteora.domain.entity.LocationInfo
 
 @Serializable
 data class NominatimSearchResponse(
 
     @SerialName("lat")
-    val latitude: String,
+    val latitude: Double,
 
     @SerialName("lon")
-    val longitude: String,
+    val longitude: Double,
 
     @SerialName("name")
     val name: String? = null,
@@ -25,15 +23,15 @@ data class NominatimSearchResponse(
     val addressType: String,
 
     @SerialName("address")
-    val address: JsonObject,
+    val address: SearchAddress,
 ) {
     fun toDomain(): LocationInfo {
         return LocationInfo(
-            latitude = latitude.toDouble(),
-            longitude = longitude.toDouble(),
-            locality = address[addressType]?.jsonPrimitive?.content,
-            country = address["country"]?.jsonPrimitive?.content,
-            countryCode = address["countryCode"]?.jsonPrimitive?.content,
+            latitude = latitude,
+            longitude = longitude,
+            locality = address.anyLocality,
+            country = address.country,
+            countryCode = address.countryCode,
             displayName = displayName
         )
     }
@@ -43,20 +41,73 @@ data class NominatimSearchResponse(
 data class SearchAddress(
 
     @SerialName("city")
-    val city: String,
+    val city: String?,
+
+    @SerialName("town")
+    val town: String?,
+
+    @SerialName("village")
+    val village: String?,
+
+    @SerialName("hamlet")
+    val hamlet: String?,
+
+    @SerialName("municipality")
+    val municipality: String?,
+
+    @SerialName("county")
+    val county: String?,
 
     @SerialName("state")
     val state: String?,
 
-    @SerialName("country_code")
-    val countryCode: String,
-
-    @SerialName("country")
-    val country: String,
+    @SerialName("administrative")
+    val administrative: String?,
 
     @SerialName("suburb")
     val suburb: String?,
 
+    @SerialName("neighbourhood")
+    val neighbourhood: String?,
+
+    @SerialName("isolated_dwelling")
+    val isolatedDwelling: String?,
+
+    @SerialName("quarter")
+    val quarter: String?,
+
+    @SerialName("locality")
+    val locality: String?,
+
+    @SerialName("allotments")
+    val allotments: String?,
+
+    @SerialName("road")
+    val road: String?,
+
+    @SerialName("country")
+    val country: String,
+
+    @SerialName("country_code")
+    val countryCode: String,
+
     @SerialName("postcode")
     val postcode: String?
-)
+) {
+    val anyLocality: String?
+        get() = city
+            ?: town
+            ?: village
+            ?: hamlet
+            ?: municipality
+            ?: suburb
+            ?: neighbourhood
+            ?: isolatedDwelling
+            ?: quarter
+            ?: locality
+            ?: allotments
+            ?: road
+            ?: administrative
+            ?: county
+            ?: state
+}

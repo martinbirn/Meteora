@@ -1,0 +1,13 @@
+<network-security-config>
+    <base-config>
+        <trust-anchors>
+            <!-- Trust user added CAs while debuggable only -->
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">nominatim.openstreetmap.org</domain>
+        <domain includeSubdomains="true">api.open-meteo.com/v1/forecast</domain>
+    </domain-config>
+</network-security-config>

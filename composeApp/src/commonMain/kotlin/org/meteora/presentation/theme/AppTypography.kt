@@ -4,6 +4,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import org.jetbrains.compose.resources.Font
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.SF_Pro_Text_Medium
@@ -31,7 +32,11 @@ val meteoraTypography: Typography
             titleLarge = titleLarge.copy(fontFamily = fontFamily, color = MeteoraColor.White),
             titleMedium = titleMedium.copy(fontFamily = fontFamily, color = MeteoraColor.White),
             titleSmall = titleSmall.copy(fontFamily = fontFamily, color = MeteoraColor.White),
-            bodyLarge = bodyLarge.copy(fontFamily = fontFamily, color = MeteoraColor.White),
+            bodyLarge = bodyLarge.copy(
+                fontFamily = fontFamily,
+                color = MeteoraColor.White,
+                baselineShift = BaselineShift.None
+            ),
             bodyMedium = bodyMedium.copy(fontFamily = fontFamily, color = MeteoraColor.White),
             bodySmall = bodySmall.copy(fontFamily = fontFamily, color = MeteoraColor.White),
             labelLarge = labelLarge.copy(fontFamily = fontFamily, color = MeteoraColor.White),

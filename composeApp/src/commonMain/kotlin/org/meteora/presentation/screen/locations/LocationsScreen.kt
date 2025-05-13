@@ -33,7 +33,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.icon.MicIcon
 import org.meteora.presentation.icon.SearchIcon
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.search_location_placeholder
@@ -80,11 +79,11 @@ private fun SharedTransitionScope.LocationsScreenContent(
                 value = "",
                 onValueChange = {},
                 modifier = Modifier
+                    .weight(weight = 1f)
                     .sharedElement(
                         sharedContentState = rememberSharedContentState(key = "search-text"),
                         animatedVisibilityScope = animatedContentScope
                     )
-                    .weight(weight = 1f)
                     .padding(start = MeteoraTheme.dimen.horizontalPadding),
                 readOnly = true,
                 onClickWhenReadOnly = onSearchClicked,
@@ -96,14 +95,6 @@ private fun SharedTransitionScope.LocationsScreenContent(
                         tint = MeteoraColor.White50
                     )
                 },
-                trailingIcon = {
-                    Icon(
-                        imageVector = MicIcon,
-                        contentDescription = "Microphone",
-                        modifier = Modifier,// TODO: Implement Mic using
-                        tint = MeteoraColor.White50
-                    )
-                }
             )
 
             // empty shared element

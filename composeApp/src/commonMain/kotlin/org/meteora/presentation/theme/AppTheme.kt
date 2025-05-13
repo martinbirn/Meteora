@@ -2,7 +2,6 @@ package org.meteora.presentation.theme
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -38,7 +37,7 @@ object MeteoraTheme {
 data class Dimensions(
     val iconSize: DpSize = DpSize(24.dp, 24.dp),
     val horizontalPadding: Dp = 16.dp,
-    val verticalPadding: Dp = 20.dp,
+    val verticalPadding: Dp = 16.dp,
     val toolbarHeight: Dp = 56.dp,
     val toolbarPadding: Dp = 18.dp
 )
@@ -50,14 +49,11 @@ fun MeteoraTheme(
     typography: Typography = meteoraTypography,
     content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(
-        LocalDimensions provides dimensions,
-        LocalTextStyle provides typography.bodyLarge
-    ) {
+    CompositionLocalProvider(LocalDimensions provides dimensions) {
         MaterialTheme(
-            content = content,
             colorScheme = colors,
-            typography = typography
+            typography = typography,
+            content = content
         )
     }
 }

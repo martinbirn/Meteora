@@ -1,5 +1,6 @@
 package org.meteora.di
 
+import dev.icerock.moko.geo.LatLng
 import dev.icerock.moko.geo.LocationTracker
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
@@ -49,8 +50,8 @@ val dataModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { (locationTracker: LocationTracker) ->
-        LocationWeatherViewModel(locationTracker, weatherRepository = get())
+    viewModel { (latLng: LatLng, locationTracker: LocationTracker) ->
+        LocationWeatherViewModel(latLng, locationTracker, weatherRepository = get())
     }
     viewModelOf(::LocationsViewModel)
     viewModelOf(::LocationSearchViewModel)

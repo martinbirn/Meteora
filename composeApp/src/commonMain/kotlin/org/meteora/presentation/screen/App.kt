@@ -1,7 +1,9 @@
 package org.meteora.presentation.screen
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +14,12 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.Uri
 import coil3.compose.setSingletonImageLoaderFactory
@@ -23,12 +28,15 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.compose.koinInject
+import org.meteora.domain.entity.LatLong
+import org.meteora.domain.entity.LatLongNavType
 import org.meteora.logging.AppLogger
 import org.meteora.logging.CoilLogger
 import org.meteora.presentation.screen.locations.LocationsScreen
 import org.meteora.presentation.screen.locationsearch.LocationSearchScreen
 import org.meteora.presentation.screen.locationweather.LocationWeatherScreen
 import org.meteora.presentation.theme.MeteoraTheme
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -72,28 +80,53 @@ fun App() {
         ) {
             SharedTransitionLayout {
                 val navController = rememberNavController()
+                val animationSpec = tween<IntOffset>(700)
+                val keyboardController = LocalSoftwareKeyboardController.current
                 NavHost(
                     navController = navController,
-                    startDestination = WeatherScreen.Locations.name,
-                    modifier = Modifier.fillMaxSize()
+                    startDestination = LocationsDestination,
+                    modifier = Modifier.fillMaxSize(),
+                    enterTransition = {
+                        slideIntoContainer(SlideDirection.Left, animationSpec)
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(SlideDirection.Left, animationSpec)
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(SlideDirection.Right, animationSpec)
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(SlideDirection.Right, animationSpec)
+                    }
                 ) {
-                    composable(route = WeatherScreen.Locations.name) {
+                    composable<LocationsDestination> {
                         LocationsScreen(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedContentScope = this@composable,
                             navigateToLocationSearch = {
-                                navController.navigate(WeatherScreen.SearchLocation.name)
+                                navController.navigate(SearchLocationDestination)
                             }
                         )
                     }
-                    composable(route = WeatherScreen.LocationWeather.name) {
-                        LocationWeatherScreen()
+                    composable<LocationWeatherDestination>(
+                        typeMap = mapOf(typeOf<LatLong>() to LatLongNavType)
+                    ) { backStackEntry ->
+                        val route = backStackEntry.toRoute<LocationWeatherDestination>()
+                        LocationWeatherScreen(latLong = route.latLong)
                     }
-                    composable(route = WeatherScreen.SearchLocation.name) {
+                    composable<SearchLocationDestination> {
                         LocationSearchScreen(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedContentScope = this@composable,
-                            navigateBack = { navController.popBackStack() }
+                            onLocationClicked = { location ->
+                                navController.navigate(
+                                    route = LocationWeatherDestination(latLong = location.latLong)
+                                )
+                            },
+                            navigateBack = {
+                                keyboardController?.hide()
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }

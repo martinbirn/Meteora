@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.domain.repository.WeatherRepository
 
 @OptIn(FlowPreview::class)
@@ -67,7 +68,7 @@ class LocationSearchViewModel(
         _inputText.update { "" }
     }
 
-    fun selectLocation(location: String) {
+    fun selectLocation(location: LocationInfoShort) {
 
     }
 
@@ -80,6 +81,6 @@ sealed class LocationSearchState {
     object Idle : LocationSearchState()
     object Loading : LocationSearchState()
     object NoResult : LocationSearchState()
-    data class Content(val locations: List<String>) : LocationSearchState()
+    data class Content(val locations: List<LocationInfoShort>) : LocationSearchState()
     data class Error(val throwable: Throwable) : LocationSearchState()
 }
