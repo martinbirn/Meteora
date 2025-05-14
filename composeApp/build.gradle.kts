@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -137,11 +135,7 @@ dependencies {
 buildkonfig {
     packageName = "org.meteora"
 
-    val key: String = gradleLocalProperties(rootDir, providers).getProperty("WEATHER_API_KEY")
-
-    defaultConfigs {
-        buildConfigField(STRING, "WEATHER_API_KEY", key, const = true)
-    }
+    defaultConfigs {}
 }
 
 sqldelight {
