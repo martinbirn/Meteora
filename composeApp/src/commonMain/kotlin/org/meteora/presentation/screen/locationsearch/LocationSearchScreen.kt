@@ -52,8 +52,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.icon.SearchIcon
-import org.meteora.presentation.icon.XCircleIcon
+import org.meteora.presentation.icon.MeteoraIcons
+import org.meteora.presentation.icon.Search
+import org.meteora.presentation.icon.XCircle
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.add
 import org.meteora.presentation.resources.cancel
@@ -170,7 +171,7 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                 placeholder = stringResource(resource = Res.string.search_location_placeholder),
                 leadingIcon = {
                     Icon(
-                        imageVector = SearchIcon,
+                        imageVector = MeteoraIcons.Search,
                         contentDescription = "Search",
                         tint = MeteoraColor.White50
                     )
@@ -178,7 +179,7 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                 trailingIcon = {
                     if (inputState.value.isNotEmpty()) {
                         Icon(
-                            imageVector = XCircleIcon,
+                            imageVector = MeteoraIcons.XCircle,
                             contentDescription = "Clear",
                             modifier = Modifier.clickable(onClick = onClearInputClicked),
                             tint = MeteoraColor.White50

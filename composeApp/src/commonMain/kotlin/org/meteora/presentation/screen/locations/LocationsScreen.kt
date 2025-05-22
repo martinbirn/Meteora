@@ -45,7 +45,8 @@ import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.entity.WeatherInfoShort
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.icon.SearchIcon
+import org.meteora.presentation.icon.MeteoraIcons
+import org.meteora.presentation.icon.Search
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.search_location_placeholder
 import org.meteora.presentation.resources.weather
@@ -111,7 +112,7 @@ private fun SharedTransitionScope.LocationsScreenContent(
                 placeholder = stringResource(resource = Res.string.search_location_placeholder),
                 leadingIcon = {
                     Icon(
-                        imageVector = SearchIcon,
+                        imageVector = MeteoraIcons.Search,
                         contentDescription = "Search",
                         tint = MeteoraColor.White50
                     )

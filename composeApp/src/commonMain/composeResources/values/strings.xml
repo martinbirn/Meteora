@@ -2,6 +2,7 @@
 <resources>
     <string name="now">Now</string>
     <string name="today">Today</string>
+    <string name="hourly_forecast">HOURLY FORECAST</string>
     <string name="ten_day_forecast">10-DAY FORECAST</string>
     <string name="feels_like">FEELS LIKE</string>
     <string name="uv_index">UV INDEX</string>
@@ -31,6 +32,11 @@
     <string name="rain_showers">Rain showers</string>
     <string name="snow">Snow</string>
     <string name="thunderstorm">Thunderstorm</string>
+    <string name="freezing_drizzle">Freezing drizzle</string>
+    <string name="freezing_rain">Freezing rain</string>
+    <string name="snow_grains">Snow grains</string>
+    <string name="snow_showers">Snow showers</string>
+    <string name="thunderstorm_with_hail">Thunderstorm with hail</string>
     <string name="unknown">Unknown</string>
     <string name="weather">Weather</string>
     <string name="search_location_placeholder">Search for a city or airport</string>

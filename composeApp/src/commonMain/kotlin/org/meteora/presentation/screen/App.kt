@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -24,6 +25,7 @@ import coil3.ImageLoader
 import coil3.Uri
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
+import dev.chrisbanes.haze.rememberHazeState
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -36,6 +38,7 @@ import org.meteora.presentation.screen.locations.LocationsScreen
 import org.meteora.presentation.screen.locationsearch.LocationSearchScreen
 import org.meteora.presentation.screen.locationweather.LocationWeatherScreen
 import org.meteora.presentation.theme.MeteoraTheme
+import org.meteora.presentation.util.LocalHazeState
 import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -63,79 +66,83 @@ fun App() {
     }
 
     MeteoraTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF8780A3),
-                            Color(0xFFaeaabf)
+        val hazeState = rememberHazeState()
+        CompositionLocalProvider(LocalHazeState provides hazeState) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF8780A3),
+                                Color(0xFFaeaabf)
+                            )
                         )
                     )
-                )
-                //.shaderEffect(ShaderOptions.SNOW)
-                .systemBarsPadding()
-                .navigationBarsPadding()
-        ) {
-            SharedTransitionLayout {
-                val navController = rememberNavController()
-                val animationSpec = tween<IntOffset>(700)
-                val keyboardController = LocalSoftwareKeyboardController.current
-                NavHost(
-                    navController = navController,
-                    startDestination = LocationsDestination,
-                    modifier = Modifier.fillMaxSize(),
-                    enterTransition = {
-                        slideIntoContainer(SlideDirection.Left, animationSpec)
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(SlideDirection.Left, animationSpec)
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(SlideDirection.Right, animationSpec)
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(SlideDirection.Right, animationSpec)
-                    }
-                ) {
-                    composable<LocationsDestination> {
-                        LocationsScreen(
-                            sharedTransitionScope = this@SharedTransitionLayout,
-                            animatedContentScope = this@composable,
-                            navigateToLocationSearch = {
-                                keyboardController?.hide()
-                                navController.navigate(SearchLocationDestination)
-                            },
-                            navigateToLocationWeather = { locationInfo ->
-                                keyboardController?.hide()
-                                navController.navigate(
-                                    route = LocationWeatherDestination(locationInfo = locationInfo)
-                                )
-                            },
-                        )
-                    }
-                    composable<LocationWeatherDestination>(
-                        typeMap = mapOf(typeOf<LocationInfo>() to LocationInfoNavType)
-                    ) { backStackEntry ->
-                        val route = backStackEntry.toRoute<LocationWeatherDestination>()
-                        LocationWeatherScreen(locationInfo = route.locationInfo)
-                    }
-                    composable<SearchLocationDestination> {
-                        LocationSearchScreen(
-                            sharedTransitionScope = this@SharedTransitionLayout,
-                            animatedContentScope = this@composable,
-                            onLocationClicked = { locationInfo ->
-                                keyboardController?.hide()
-                                navController.navigate(
-                                    route = LocationWeatherDestination(locationInfo = locationInfo)
-                                )
-                            },
-                            navigateBack = {
-                                keyboardController?.hide()
-                                navController.popBackStack()
-                            }
-                        )
+                    //.hazeSource(state = hazeState) TODO: add when background ready
+                    //.shaderEffect(ShaderOptions.SNOW)
+                    .systemBarsPadding()
+                    .navigationBarsPadding()
+            ) {
+                SharedTransitionLayout {
+                    val navController = rememberNavController()
+                    val animationSpec = tween<IntOffset>(700)
+                    val keyboardController = LocalSoftwareKeyboardController.current
+                    NavHost(
+                        navController = navController,
+                        startDestination = LocationsDestination,
+                        modifier = Modifier.fillMaxSize(),
+                        enterTransition = {
+                            slideIntoContainer(SlideDirection.Left, animationSpec)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(SlideDirection.Left, animationSpec)
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(SlideDirection.Right, animationSpec)
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(SlideDirection.Right, animationSpec)
+                        }
+                    ) {
+                        composable<LocationsDestination> {
+                            LocationsScreen(
+                                sharedTransitionScope = this@SharedTransitionLayout,
+                                animatedContentScope = this@composable,
+                                navigateToLocationSearch = {
+                                    keyboardController?.hide()
+                                    navController.navigate(SearchLocationDestination)
+                                },
+                                navigateToLocationWeather = { locationInfo ->
+                                    keyboardController?.hide()
+                                    navController.navigate(
+                                        route = LocationWeatherDestination(locationInfo = locationInfo)
+                                    )
+                                },
+                            )
+                        }
+                        composable<LocationWeatherDestination>(
+                            typeMap = mapOf(typeOf<LocationInfo>() to LocationInfoNavType)
+                        ) { backStackEntry ->
+                            val route = backStackEntry.toRoute<LocationWeatherDestination>()
+                            LocationWeatherScreen(locationInfo = route.locationInfo)
+                        }
+                        composable<SearchLocationDestination> {
+                            LocationSearchScreen(
+                                sharedTransitionScope = this@SharedTransitionLayout,
+                                animatedContentScope = this@composable,
+                                onLocationClicked = { locationInfo ->
+                                    keyboardController?.hide()
+                                    navController.navigate(
+                                        route = LocationWeatherDestination(locationInfo = locationInfo)
+                                    )
+                                },
+                                navigateBack = {
+                                    keyboardController?.hide()
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
                     }
                 }
             }
