@@ -18,10 +18,8 @@ import org.meteora.domain.entity.WeatherInfoShort
 import org.meteora.domain.repository.WeatherApiRepository
 import org.meteora.domain.repository.WeatherLocalRepository
 import kotlin.concurrent.Volatile
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 class LocationsViewModel(
     private val weatherApiRepository: WeatherApiRepository,
     weatherLocalRepository: WeatherLocalRepository,
@@ -77,7 +75,7 @@ class LocationsViewModel(
         }
     }
 
-    fun getLocationInfoByKey(key: String): LocationInfo? = _keyWeatherMap[key]?.toLocationInfo()
+    fun getLocationInfoByKey(key: String): LocationInfo? = _keyWeatherMap[key]?.locationInfo
 }
 
 sealed class LocationsState {

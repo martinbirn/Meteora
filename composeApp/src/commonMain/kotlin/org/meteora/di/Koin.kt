@@ -1,5 +1,6 @@
 package org.meteora.di
 
+import app.cash.sqldelight.db.SqlDriver
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,6 +13,8 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import org.meteora.cache.Database
+import org.meteora.cache.DatabaseDriverFactory
 import org.meteora.data.repository.WeatherApiRepositoryImpl
 import org.meteora.data.repository.WeatherLocalRepositoryImpl
 import org.meteora.domain.entity.LocationInfo
@@ -43,8 +46,11 @@ val networkModule = module {
 }
 
 val dataModule = module {
+    single<SqlDriver> { get<DatabaseDriverFactory>().createDriver() }
+    single<Database> { Database(sqlDriver = get()) }
+
     single<WeatherApiRepository> { WeatherApiRepositoryImpl(client = get()) }
-    single<WeatherLocalRepository> { WeatherLocalRepositoryImpl(databaseDriverFactory = get()) }
+    single<WeatherLocalRepository> { WeatherLocalRepositoryImpl(database = get()) }
 }
 
 val viewModelModule = module {

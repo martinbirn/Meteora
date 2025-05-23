@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class LocationInfoShort(
-    val key: String,
+    val id: String,
     val displayName: String,
     val latitude: Double,
     val longitude: Double,

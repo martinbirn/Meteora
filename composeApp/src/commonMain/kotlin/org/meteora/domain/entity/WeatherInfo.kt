@@ -6,7 +6,7 @@ typealias WeatherCode = Int
 typealias DirectionAngle = Int
 
 data class WeatherInfo(
-    val location: Location,
+    val locationInfo: LocationInfo,
     val main: Main,
     val weatherCode: WeatherCode,
     val visibility: Double,
@@ -19,13 +19,6 @@ data class WeatherInfo(
     val dailies: List<DailyWeatherInfo>,
     val hourlies: List<HourlyWeatherInfo>
 ) {
-    data class Location(
-        val lat: Double,
-        val lon: Double,
-        val locality: String?,
-        val country: String,
-        val countryCode: String,
-    )
 
     data class Main(
         val temp: Double,
@@ -40,23 +33,12 @@ data class WeatherInfo(
     fun toShortInfo(key: String): WeatherInfoShort {
         return WeatherInfoShort(
             key = key,
-            name = location.locality.orEmpty(),
+            name = locationInfo.locality.orEmpty(),
             temp = main.temp,
             tempMin = main.tempMin,
             tempMax = main.tempMax,
             weatherCode = weatherCode,
             lastUpdate = Clock.System.now().toEpochMilliseconds(),
-        )
-    }
-
-    fun toLocationInfo(): LocationInfo {
-        return LocationInfo(
-            latitude = location.lat,
-            longitude = location.lon,
-            locality = location.locality,
-            country = location.country,
-            countryCode = location.countryCode,
-            displayName = location.locality.orEmpty()
         )
     }
 }

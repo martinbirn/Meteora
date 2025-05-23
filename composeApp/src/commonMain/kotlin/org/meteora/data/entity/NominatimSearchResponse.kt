@@ -3,6 +3,7 @@ package org.meteora.data.entity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.meteora.domain.entity.LocationInfo
+import kotlin.uuid.Uuid
 
 @Serializable
 data class NominatimSearchResponse(
@@ -27,6 +28,7 @@ data class NominatimSearchResponse(
 ) {
     fun toDomain(): LocationInfo {
         return LocationInfo(
+            id = Uuid.random().toString(),
             latitude = latitude,
             longitude = longitude,
             locality = address.anyLocality,

@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.meteora.domain.entity.DailyWeatherInfo
@@ -42,7 +41,6 @@ import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.icon
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun DailyForecastCard(
     todayTemp: Int,

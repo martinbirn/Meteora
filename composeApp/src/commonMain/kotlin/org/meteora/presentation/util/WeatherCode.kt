@@ -96,7 +96,7 @@ val Int.dayIcon: ImageVector
         71, 73 -> WeatherIcons.Snow
         75, 77 -> WeatherIcons.HeavySnow
         80, 81 -> WeatherIcons.HeavyRain
-        82 -> WeatherIcons.Thunderstorm // буря или очень сильный дождь
+        82 -> WeatherIcons.Thunderstorm
         85 -> WeatherIcons.Snow
         86 -> WeatherIcons.HeavySnow
         95 -> WeatherIcons.Thunderstorm

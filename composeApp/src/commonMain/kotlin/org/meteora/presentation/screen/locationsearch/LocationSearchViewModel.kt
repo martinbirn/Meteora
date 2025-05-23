@@ -3,7 +3,6 @@ package org.meteora.presentation.screen.locationsearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +16,7 @@ import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.domain.repository.WeatherApiRepository
 import org.meteora.domain.repository.WeatherLocalRepository
 import kotlin.concurrent.Volatile
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
-@OptIn(FlowPreview::class, ExperimentalUuidApi::class)
 class LocationSearchViewModel(
     private val weatherApiRepository: WeatherApiRepository,
     private val weatherLocalRepository: WeatherLocalRepository,
@@ -56,9 +52,8 @@ class LocationSearchViewModel(
                         val locationsShort = ArrayList<LocationInfoShort>(locations.size)
                         val keyLocationMap = HashMap<String, LocationInfo>(locations.size)
                         locations.forEach { location ->
-                            val key = Uuid.random().toString()
-                            locationsShort.add(location.toShortInfo(key))
-                            keyLocationMap[key] = location
+                            locationsShort.add(location.toShortInfo())
+                            keyLocationMap[location.id] = location
                         }
                         _keyLocationMap = keyLocationMap
                         _state.update {
@@ -88,7 +83,7 @@ class LocationSearchViewModel(
     }
 
     fun showLocation(location: LocationInfoShort) {
-        _state.update { it.copy(selectedLocation = _keyLocationMap[location.key]) }
+        _state.update { it.copy(selectedLocation = _keyLocationMap[location.id]) }
     }
 
     fun hideLocation() {

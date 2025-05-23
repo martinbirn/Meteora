@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -128,7 +127,6 @@ fun LocationWeatherScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun LocationWeatherScreenContent(
     screenState: LocationWeatherViewModel.State
@@ -156,7 +154,7 @@ private fun LocationWeatherScreenContent(
         is LocationWeatherState.Content -> {
             Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
             Text(
-                text = "${weatherState.weatherInfo.location.locality}, ${weatherState.weatherInfo.location.country}",
+                text = "${weatherState.weatherInfo.locationInfo.locality}, ${weatherState.weatherInfo.locationInfo.country}",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
             )

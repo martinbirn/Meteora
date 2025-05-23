@@ -2,20 +2,22 @@ package org.meteora.cache
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.db.SqlDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.meteora.data.entity.DbLocation
 
-internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
-    private val database = MeteoraDatabase(databaseDriverFactory.createDriver())
+internal class Database(sqlDriver: SqlDriver) {
+    private val database = MeteoraDatabase(sqlDriver)
     private val dbQuery = database.meteoraDatabaseQueries
 
     internal fun getAllLocations(): Flow<List<DbLocation>> {
         return dbQuery.selectAll().asFlow().mapToList(Dispatchers.IO).map { list ->
             list.map {
                 DbLocation(
+                    id = it.id,
                     latitude = it.latitude,
                     longitude = it.longitude,
                     locality = it.locality,
@@ -27,9 +29,10 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         }
     }
 
-    internal fun getLocationById(id: Long): DbLocation? {
+    internal fun getLocationById(id: String): DbLocation? {
         return dbQuery.selectById(id).executeAsOneOrNull()?.let {
             DbLocation(
+                id = it.id,
                 latitude = it.latitude,
                 longitude = it.longitude,
                 locality = it.locality,
@@ -43,6 +46,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
     internal fun getLocationByCoordinates(latitude: Double, longitude: Double): DbLocation? {
         return dbQuery.selectByCoordinates(latitude, longitude).executeAsOneOrNull()?.let {
             DbLocation(
+                id = it.id,
                 latitude = it.latitude,
                 longitude = it.longitude,
                 locality = it.locality,
@@ -55,6 +59,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
 
     internal fun insertLocation(location: DbLocation) {
         dbQuery.insertLocation(
+            id = location.id,
             latitude = location.latitude,
             longitude = location.longitude,
             locality = location.locality,
@@ -64,15 +69,11 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    internal fun deleteLocation(id: Long) {
-        dbQuery.deleteLocation(id)
+    internal fun deleteLocationById(id: String) {
+        dbQuery.deleteLocationById(id)
     }
 
-    internal fun clearDatabase() {
-        dbQuery.transaction {
-            dbQuery.selectAll().executeAsList().forEach {
-                dbQuery.deleteLocation(it.id)
-            }
-        }
+    internal fun deleteAllLocations() {
+        dbQuery.deleteAllLocations()
     }
 }

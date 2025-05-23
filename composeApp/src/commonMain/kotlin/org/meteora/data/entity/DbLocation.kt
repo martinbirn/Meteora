@@ -6,6 +6,8 @@ import org.meteora.domain.entity.LocationInfo
 
 @Serializable
 data class DbLocation(
+    @SerialName("id")
+    val id: String,
     @SerialName("latitude")
     val latitude: Double,
     @SerialName("longitude")
@@ -22,6 +24,7 @@ data class DbLocation(
 
     fun toDomain(): LocationInfo {
         return LocationInfo(
+            id = id,
             latitude = latitude,
             longitude = longitude,
             locality = locality,
@@ -34,6 +37,7 @@ data class DbLocation(
     companion object {
         fun fromDomain(location: LocationInfo): DbLocation {
             return DbLocation(
+                id = location.id,
                 latitude = location.latitude,
                 longitude = location.longitude,
                 locality = location.locality,

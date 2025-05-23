@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class)
-
 package org.meteora.presentation.screen.locationsearch
 
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +21,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
 import org.meteora.presentation.icon.MeteoraIcons
@@ -64,12 +59,10 @@ import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.preview.PreviewSharedLayout
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationSearchScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    onLocationClicked: (LocationInfo) -> Unit,
     navigateBack: () -> Unit
 ) {
     val viewModel: LocationSearchViewModel = koinViewModel()
@@ -135,7 +128,6 @@ fun LocationSearchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SharedTransitionScope.LocationSearchContentScreen(
     animatedContentScope: AnimatedContentScope,
@@ -248,7 +240,7 @@ private fun SearchResultList(
     LazyColumn {
         items(
             count = items.size,
-            key = { index -> items[index].key }
+            key = { index -> items[index].id }
         ) { index ->
             val item = items[index]
             Text(

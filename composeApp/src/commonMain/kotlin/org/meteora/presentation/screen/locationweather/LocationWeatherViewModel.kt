@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dev.icerock.moko.geo.LocationTracker
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +19,6 @@ import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.repository.WeatherApiRepository
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class LocationWeatherViewModel(
     private val locationInfo: LocationInfo?,
     private val weatherApiRepository: WeatherApiRepository

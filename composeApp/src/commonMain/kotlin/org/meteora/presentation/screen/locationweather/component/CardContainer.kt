@@ -10,12 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.util.LocalHazeState
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun SquareContainer(
     modifier: Modifier = Modifier,
@@ -27,7 +25,6 @@ fun SquareContainer(
     )
 }
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun BlurredContainer(
     modifier: Modifier = Modifier,

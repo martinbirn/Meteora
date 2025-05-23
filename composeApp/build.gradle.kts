@@ -16,7 +16,22 @@ kotlin {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
+//            instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+//            unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.unitTest)
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-Xexpect-actual-classes",
+            "-opt-in=kotlin.uuid.ExperimentalUuidApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi",
+            "-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi",
+            "-opt-in=dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi",
+        )
     }
 
     listOf(
@@ -80,6 +95,18 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
 
             implementation(libs.napier)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.koin.test)
+            implementation(libs.androidx.test.core)
+            implementation(libs.roboletric)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlin.coroutines.test)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.test)
+            implementation(libs.ktor.client.mock)
         }
     }
 }

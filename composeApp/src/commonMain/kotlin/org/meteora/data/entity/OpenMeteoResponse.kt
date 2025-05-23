@@ -48,13 +48,7 @@ data class OpenMeteoResponse(
         }
 
         return WeatherInfo(
-            location = WeatherInfo.Location(
-                lat = latitude,
-                lon = longitude,
-                locality = locationInfo.locality,
-                country = locationInfo.country,
-                countryCode = locationInfo.countryCode
-            ),
+            locationInfo = locationInfo,
             main = WeatherInfo.Main(
                 temp = current.temperature2m,
                 feelsLike = current.apparentTemperature,

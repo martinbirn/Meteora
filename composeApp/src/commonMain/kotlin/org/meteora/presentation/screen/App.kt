@@ -1,7 +1,6 @@
 package org.meteora.presentation.screen
 
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -41,7 +40,6 @@ import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
 import kotlin.reflect.typeOf
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun App() {
     val appLogger = koinInject<AppLogger>()
@@ -131,12 +129,6 @@ fun App() {
                             LocationSearchScreen(
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 animatedContentScope = this@composable,
-                                onLocationClicked = { locationInfo ->
-                                    keyboardController?.hide()
-                                    navController.navigate(
-                                        route = LocationWeatherDestination(locationInfo = locationInfo)
-                                    )
-                                },
                                 navigateBack = {
                                     keyboardController?.hide()
                                     navController.popBackStack()

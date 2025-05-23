@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class LocationInfo(
+    val id: String,
     val latitude: Double,
     val longitude: Double,
     val locality: String?, // city, town, village, administrative, etc.
@@ -20,9 +21,9 @@ data class LocationInfo(
     val latLng: LatLng
         get() = LatLng(latitude, longitude)
 
-    fun toShortInfo(key: String): LocationInfoShort {
+    fun toShortInfo(): LocationInfoShort {
         return LocationInfoShort(
-            key = key,
+            id = id,
             displayName = displayName,
             latitude = latitude,
             longitude = longitude,

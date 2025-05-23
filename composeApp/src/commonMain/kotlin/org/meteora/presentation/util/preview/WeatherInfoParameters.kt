@@ -5,17 +5,21 @@ import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.HourlyWeatherInfo
+import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
+import kotlin.uuid.Uuid
 
 class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
     override val values = sequenceOf(
         WeatherInfo(
-            location = WeatherInfo.Location(
-                lat = 51.1,
-                lon = 17.03,
+            locationInfo = LocationInfo(
+                id = Uuid.random().toString(),
+                latitude = 51.1,
+                longitude = 17.03,
                 locality = "Wrocław",
                 country = "Poland",
                 countryCode = "PL",
+                displayName = "Wrocław, Poland"
             ),
             main = WeatherInfo.Main(
                 temp = 13.5,
@@ -38,12 +42,14 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             hourlies = createSampleHourlies(),
         ),
         WeatherInfo(
-            location = WeatherInfo.Location(
-                lat = 51.1,
-                lon = 17.03,
+            locationInfo = LocationInfo(
+                id = Uuid.random().toString(),
+                latitude = 51.1,
+                longitude = 17.03,
                 locality = "Wrocław",
                 country = "Poland",
                 countryCode = "PL",
+                displayName = "Wrocław, Poland"
             ),
             main = WeatherInfo.Main(
                 temp = 10.2,
@@ -66,12 +72,14 @@ class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
             hourlies = createSampleHourlies(startWeatherCode = 3)
         ),
         WeatherInfo(
-            location = WeatherInfo.Location(
-                lat = 51.1,
-                lon = 17.03,
+            locationInfo = LocationInfo(
+                id = Uuid.random().toString(),
+                latitude = 51.1,
+                longitude = 17.03,
                 locality = "Wrocław",
                 country = "Poland",
                 countryCode = "PL",
+                displayName = "Wrocław, Poland"
             ),
             main = WeatherInfo.Main(
                 temp = 8.7,

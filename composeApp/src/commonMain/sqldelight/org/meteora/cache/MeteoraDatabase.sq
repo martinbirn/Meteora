@@ -1,5 +1,5 @@
 CREATE TABLE Location (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     locality TEXT,
@@ -19,8 +19,11 @@ SELECT * FROM Location
 WHERE latitude = ? AND longitude = ?;
 
 insertLocation:
-INSERT INTO Location(latitude, longitude, locality, country, countryCode, displayName)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Location(id, latitude, longitude, locality, country, countryCode, displayName)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
-deleteLocation:
-DELETE FROM Location WHERE id = ?; 
+deleteLocationById:
+DELETE FROM Location WHERE id = ?;
+
+deleteAllLocations:
+DELETE FROM Location;

@@ -1,32 +1,32 @@
 package org.meteora.presentation.util.shader
 
 const val clouds_sksl = """
-uniform float2 iResolution;      // Разрешение области просмотра (пиксели)
-uniform float  iTime;            // Время выполнения шейдера (секунды)
-uniform float  weatherType;      // Тип погоды: 0.0 = солнечно, 0.5 = переменная облачность, 1.0 = облачно
-uniform float2 sunPosition;      // Позиция солнца, по умолчанию (0.8, 0.2)
+uniform float2 iResolution;      // Viewport resolution (pixels)
+uniform float  iTime;            // Shader running time (seconds)
+uniform float  weatherType;      // Weather type: 0.0 = sunny, 0.5 = partly cloudy, 1.0 = cloudy
+uniform float2 sunPosition;      // Sun position, default (0.8, 0.2)
 
-// ======= НАСТРАИВАЕМЫЕ ПАРАМЕТРЫ =======
-// Можно изменять эти значения для настройки внешнего вида облаков
+// ======= CUSTOMIZABLE PARAMETERS =======
+// You can change these values to customize the appearance of the clouds
 
-// Основные настройки облаков
-const float cloudscale = 1.1;   // Масштаб облаков, большее значение = меньше облаков
-const float speed = 0.03;       // Скорость движения облаков
-const float clouddark = 0.5;    // Затенение нижней части облаков
-const float cloudlight = 0.3;   // Освещение верхней части облаков
-const float cloudcover = 0.2;   // Базовое покрытие небосвода облаками
-const float cloudalpha = 8.0;   // Непрозрачность облаков
-const float skytint = 0.5;      // Интенсивность оттенка неба
+// Basic cloud settings
+const float cloudscale = 1.1;   // Cloud scale, larger value = fewer clouds
+const float speed = 0.03;       // Cloud movement speed
+const float clouddark = 0.5;    // Shading of the lower part of the clouds
+const float cloudlight = 0.3;   // Lighting of the upper part of the clouds
+const float cloudcover = 0.2;   // Base cloud coverage of the sky
+const float cloudalpha = 8.0;   // Cloud opacity
+const float skytint = 0.5;      // Sky tint intensity
 
-// Цвета неба
-const vec3 skycolour1 = vec3(0.2, 0.4, 0.6);  // Цвет неба сверху
-const vec3 skycolour2 = vec3(0.4, 0.7, 1.0);  // Цвет неба снизу
+// Sky colors
+const vec3 skycolour1 = vec3(0.2, 0.4, 0.6);  // Sky color at the top
+const vec3 skycolour2 = vec3(0.4, 0.7, 1.0);  // Sky color at the bottom
 
-// Настройки солнца
-const float sun_size = 0.07;     // Размер солнечного диска
-const float sun_glow = 3.0;      // Интенсивность свечения солнца
+// Sun settings
+const float sun_size = 0.07;     // Size of the sun disk
+const float sun_glow = 3.0;      // Sun glow intensity
 
-// ======= КОНЕЦ НАСТРАИВАЕМЫХ ПАРАМЕТРОВ =======
+// ======= END OF CUSTOMIZABLE PARAMETERS =======
 
 const mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
 
@@ -48,36 +48,36 @@ float noise( in vec2 p ) {
     return dot(n, vec3(70.0));  
 }
 
-// Оптимизированная функция fbm с возможностью раннего завершения
+// Optimized fbm function with early exit capability
 float fbm(vec2 n) {
   float total = 0.0, amplitude = 0.1;
-  // Количество итераций зависит от погоды (меньше для производительности)
+  // Number of iterations depends on weather (fewer for performance)
   int iterations = 7;
-  if (weatherType > 0.0) {  // Если определена переменная weatherType
+  if (weatherType > 0.0) {  // If weatherType variable is defined
     iterations = int(7.0 - weatherType * 2.0);
-    iterations = max(4, iterations); // Минимум 4 итерации
+    iterations = max(4, iterations); // Minimum 4 iterations
   }
   
   for (int i = 0; i < 7; i++) {
-    if (i >= iterations) break;  // Раннее завершение
+    if (i >= iterations) break;  // Early exit
     
     total += noise(n) * amplitude;
     n = m * n;
     amplitude *= 0.4;
     
-    // Раннее завершение, если вклад незначителен
+    // Early exit if contribution is negligible
     if (amplitude < 0.001) break;
   }
   return total;
 }
 
-// Функция для рендеринга солнца
+// Function to render the sun
 vec3 renderSun(vec2 uv, vec2 sunPos, float weatherType) {
-    // Если переменные не определены, используем значения по умолчанию
+    // If variables are not defined, use default values
     if (length(sunPos) < 0.01) sunPos = vec2(0.8, 0.2);
     float sunVisibility = 1.0;
     
-    if (weatherType > 0.0) {  // Если определена переменная weatherType
+    if (weatherType > 0.0) {  // If weatherType variable is defined
         sunVisibility = 1.0 - min(1.0, weatherType * 1.5);
     }
     
@@ -85,13 +85,13 @@ vec3 renderSun(vec2 uv, vec2 sunPos, float weatherType) {
     
     float dist = length(uv - sunPos);
     
-    // Солнечный диск
+    // Sun disk
     float sunDisk = smoothstep(sun_size, sun_size - 0.005, dist) * sunVisibility;
     
-    // Сияние вокруг солнца
+    // Glow around the sun
     float sunGlow = exp(-dist * sun_glow) * 0.7 * sunVisibility;
     
-    // Лучи солнца (если есть время)
+    // Sun rays (if time permits)
     float rays = 0.0;
     if (iTime > 0.0) {
         float rayAngle = atan(uv.y - sunPos.y, uv.x - sunPos.x);
@@ -115,36 +115,36 @@ half4 main(in vec2 fragCoord ) {
     float time = iTime * speed;
     float q = fbm(uv * cloudscale * 0.5);
     
-    // Настройка покрытия облаками в зависимости от типа погоды
+    // Adjust cloud cover based on weather type
     float weatherBasedCloudCover = cloudcover;
-    if (weatherType > 0.0) {  // Если определена переменная weatherType
-        weatherBasedCloudCover += weatherType * 0.4; // Больше облаков для облачной погоды
+    if (weatherType > 0.0) {  // If weatherType variable is defined
+        weatherBasedCloudCover += weatherType * 0.4; // More clouds for cloudy weather
     }
     
-    //ridged noise shape - формирует основную структуру облаков
+    //ridged noise shape - forms the main cloud structure
     float r = 0.0;
     uv *= cloudscale;
     uv -= q - time;
     float weight = 0.8;
     
-    // Оптимизация итераций на основе типа погоды
+    // Optimize iterations based on weather type
     int iterations = 8;
-    if (weatherType > 0.0) {  // Если определена переменная weatherType
+    if (weatherType > 0.0) {  // If weatherType variable is defined
         iterations = int(8.0 - weatherType * 2.0);
-        iterations = max(5, iterations); // Минимум 5 итераций
+        iterations = max(5, iterations); // Minimum 5 iterations
     }
     
     for (int i=0; i<8; i++){
-        if (i >= iterations) break;  // Раннее завершение
+        if (i >= iterations) break;  // Early exit
         r += abs(weight*noise( uv ));
         uv = m*uv + time;
         weight *= 0.7;
         
-        // Раннее завершение, если вклад незначителен
+        // Early exit if contribution is negligible
         if (weight < 0.01) break;
     }
     
-    //noise shape - добавляет детали к облакам
+    //noise shape - adds details to clouds
     float f = 0.0;
     uv = p*vec2(iResolution.x/iResolution.y,1.0);
     uv *= cloudscale;
@@ -152,18 +152,18 @@ half4 main(in vec2 fragCoord ) {
     weight = 0.7;
     
     for (int i=0; i<8; i++){
-        if (i >= iterations) break;  // Раннее завершение
+        if (i >= iterations) break;  // Early exit
         f += weight*noise( uv );
         uv = m*uv + time;
         weight *= 0.6;
         
-        // Раннее завершение, если вклад незначителен
+        // Early exit if contribution is negligible
         if (weight < 0.01) break;
     }
     
     f *= r + f;
     
-    //noise colour - добавляет вариации цвета внутри облаков
+    //noise colour - adds color variations within clouds
     float c = 0.0;
     time = iTime * speed * 2.0;
     uv = p*vec2(iResolution.x/iResolution.y,1.0);
@@ -172,16 +172,16 @@ half4 main(in vec2 fragCoord ) {
     weight = 0.4;
     
     for (int i=0; i<7; i++){
-        if (i >= iterations-1) break;  // Раннее завершение
+        if (i >= iterations-1) break;  // Early exit
         c += weight*noise( uv );
         uv = m*uv + time;
         weight *= 0.6;
         
-        // Раннее завершение, если вклад незначителен
+        // Early exit if contribution is negligible
         if (weight < 0.01) break;
     }
     
-    //noise ridge colour - добавляет текстуру к краям облаков
+    //noise ridge colour - adds texture to cloud edges
     float c1 = 0.0;
     time = iTime * speed * 3.0;
     uv = p*vec2(iResolution.x/iResolution.y,1.0);
@@ -190,44 +190,44 @@ half4 main(in vec2 fragCoord ) {
     weight = 0.4;
     
     for (int i=0; i<7; i++){
-        if (i >= iterations-1) break;  // Раннее завершение
+        if (i >= iterations-1) break;  // Early exit
         c1 += abs(weight*noise( uv ));
         uv = m*uv + time;
         weight *= 0.6;
         
-        // Раннее завершение, если вклад незначителен
+        // Early exit if contribution is negligible
         if (weight < 0.01) break;
     }
     
     c += c1;
     
-    // Основной цвет неба
+    // Base sky color
     vec3 skycolour = mix(skycolour2, skycolour1, p.y);
     
-    // Затемнение неба для облачной погоды
-    if (weatherType > 0.0) {  // Если определена переменная weatherType
+    // Darken sky for cloudy weather
+    if (weatherType > 0.0) {  // If weatherType variable is defined
         skycolour = mix(skycolour, skycolour * 0.8, weatherType * 0.5);
     }
     
-    // Цвет облаков
+    // Cloud color
     vec3 cloudcolour = vec3(1.1, 1.1, 0.9) * clamp((clouddark + cloudlight*c), 0.0, 1.0);
     
-    // Темнее облака для облачной погоды
-    if (weatherType > 0.0) {  // Если определена переменная weatherType
+    // Darker clouds for cloudy weather
+    if (weatherType > 0.0) {  // If weatherType variable is defined
         cloudcolour = mix(cloudcolour, cloudcolour * 0.9, weatherType * 0.5);
     }
     
-    // Добавляем солнце (если определены переменные)
+    // Add sun (if variables are defined)
     vec3 sunEffect = vec3(0.0);
-    if (weatherType >= 0.0) {  // Используем этот код, если определена переменная weatherType
+    if (weatherType >= 0.0) {  // Use this code if weatherType variable is defined
         sunEffect = renderSun(uv, sunPosition, weatherType);
         skycolour += sunEffect;
     }
     
-    // Итоговое покрытие облаками
+    // Final cloud coverage
     f = weatherBasedCloudCover + cloudalpha*f*r;
     
-    // Итоговый цвет с учетом смешивания неба и облаков
+    // Final color with sky and cloud blending
     vec3 result = mix(skycolour, clamp(skytint * skycolour + cloudcolour, 0.0, 1.0), clamp(f + c, 0.0, 1.0));
     
     return vec4( result, 1.0 );
