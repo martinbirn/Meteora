@@ -26,7 +26,6 @@ interface AppComponent : BackHandlerOwner {
         class Locations(val component: DefaultLocationsComponent) : Child()
         class LocationSearch(val component: DefaultLocationSearchComponent) : Child()
         class LocationWeather(val component: DefaultLocationWeatherComponent) : Child()
-        class LocationWeatherSheet(val component: DefaultLocationWeatherSheetComponent) : Child()
     }
 }
 
@@ -65,10 +64,8 @@ class DefaultAppComponent(
                     component = DefaultLocationSearchComponent(
                         componentContext = componentContext,
                         weatherApiRepository = get(),
-                        onNavigateToLocationWeather = {
-                            navigation.push(Config.LocationWeatherSheet(locationInfo = it))
-                        },
                         onNavigateBack = navigation::pop,
+                        onNavigateBackTo = navigation::popTo
                     )
                 )
 
@@ -78,19 +75,6 @@ class DefaultAppComponent(
                         componentContext = componentContext,
                         initialLocation = config.locationInfo,
                         weatherApiRepository = get(),
-                    )
-                )
-
-            is Config.LocationWeatherSheet ->
-                Child.LocationWeatherSheet(
-                    component = DefaultLocationWeatherSheetComponent(
-                        componentContext = componentContext,
-                        locationInfo = config.locationInfo,
-                        dialogState = LocationWeatherSheet(isDismissAllowed = true),
-                        weatherApiRepository = get(),
-                        weatherLocalRepository = get(),
-                        onNavigateBack = navigation::pop,
-                        onAddLocation = { navigation.popTo(0) }
                     )
                 )
         }
@@ -113,8 +97,5 @@ class DefaultAppComponent(
 
         @Serializable
         data class LocationWeather(val locationInfo: LocationInfo) : Config
-
-        @Serializable
-        data class LocationWeatherSheet(val locationInfo: LocationInfo) : Config
     }
 }

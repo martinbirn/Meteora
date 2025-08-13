@@ -23,15 +23,19 @@ interface LocationWeatherSheetComponent : BottomSheetContentComponent {
 class DefaultLocationWeatherSheetComponent(
     componentContext: ComponentContext,
     override val locationInfo: LocationInfo,
-    dialogState: LocationWeatherSheet,
     weatherApiRepository: WeatherApiRepository,
     private val weatherLocalRepository: WeatherLocalRepository,
     private val onNavigateBack: () -> Unit,
     private val onAddLocation: () -> Unit,
 ) : LocationWeatherSheetComponent, ComponentContext by componentContext {
 
-    override val state = MutableStateFlow(dialogState)
-    override val bottomSheetContentState = state
+    private val _state = MutableStateFlow(
+        LocationWeatherSheet(isDismissAllowed = true)
+    )
+
+    override val state: StateFlow<LocationWeatherSheet> = _state
+
+    override val bottomSheetContentState: StateFlow<BottomSheetContentState> = state
 
     override val weatherComponent =
         DefaultLocationWeatherComponent(

@@ -21,7 +21,6 @@ import org.meteora.presentation.decompose.DefaultAppComponent
 import org.meteora.presentation.screen.locations.LocationsScreen
 import org.meteora.presentation.screen.locationsearch.LocationSearchScreen
 import org.meteora.presentation.screen.locationweather.LocationWeatherScreen
-import org.meteora.presentation.screen.locationweather.LocationWeatherSheet
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
 import org.meteora.presentation.util.backAnimation
@@ -78,7 +77,6 @@ fun AppView(component: AppComponent) {
             is Child.Locations -> LocationsScreen(child.component)
             is Child.LocationSearch -> LocationSearchScreen(child.component)
             is Child.LocationWeather -> LocationWeatherScreen(child.component)
-            is Child.LocationWeatherSheet -> LocationWeatherSheet(child.component)
         }
     }
 }

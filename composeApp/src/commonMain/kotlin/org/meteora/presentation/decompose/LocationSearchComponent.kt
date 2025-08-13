@@ -1,18 +1,29 @@
 package org.meteora.presentation.decompose
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.pages.ChildPages
+import com.arkivanov.decompose.router.pages.PagesNavigation
+import com.arkivanov.decompose.value.Value
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.domain.repository.WeatherApiRepository
+import org.meteora.presentation.decompose.bottomsheet.BottomSheetContentComponent
+import org.meteora.presentation.decompose.bottomsheet.pages.navigation.bottomSheetPages
+import org.meteora.presentation.decompose.bottomsheet.pages.navigation.pop
+import org.meteora.presentation.decompose.bottomsheet.pages.navigation.pushNew
 import org.meteora.util.coroutineScope
 
 interface LocationSearchComponent {
     val uiState: StateFlow<LocationSearchUiState>
+    val bottomSheetPages: Value<ChildPages<*, BottomSheetContentComponent>>
 
     val inputText: StateFlow<String>
 
@@ -23,19 +34,30 @@ interface LocationSearchComponent {
     fun navigateToLocationWeather(location: LocationInfoShort)
 
     fun navigateBack()
+
+    fun dismissBottomSheet()
 }
 
 class DefaultLocationSearchComponent(
     componentContext: ComponentContext,
     private val weatherApiRepository: WeatherApiRepository,
-    private val onNavigateToLocationWeather: (LocationInfo) -> Unit,
     private val onNavigateBack: () -> Unit,
-) : LocationSearchComponent, ComponentContext by componentContext {
+    private val onNavigateBackTo: (Int) -> Unit,
+) : LocationSearchComponent, KoinComponent, ComponentContext by componentContext {
 
     private val coroutineScope = coroutineScope()
 
     private val _uiState = MutableStateFlow<LocationSearchUiState>(LocationSearchUiState.Idle)
     override val uiState: StateFlow<LocationSearchUiState> = _uiState
+
+    private val bottomSheetPagesNavigation = PagesNavigation<SearchBottomSheetConfig>()
+
+    override val bottomSheetPages: Value<ChildPages<SearchBottomSheetConfig, BottomSheetContentComponent>> =
+        bottomSheetPages(
+            source = bottomSheetPagesNavigation,
+            serializer = SearchBottomSheetConfig.serializer(),
+            childFactory = ::child,
+        )
 
     private val _input = MutableStateFlow("")
     override val inputText: StateFlow<String> = _input
@@ -76,6 +98,24 @@ class DefaultLocationSearchComponent(
         }
     }
 
+    private fun child(
+        config: SearchBottomSheetConfig,
+        componentContext: ComponentContext
+    ): BottomSheetContentComponent =
+        when (config) {
+            is SearchBottomSheetConfig.LocationWeather ->
+                DefaultLocationWeatherSheetComponent(
+                    componentContext = componentContext,
+                    locationInfo = config.locationInfo,
+                    weatherApiRepository = get(),
+                    weatherLocalRepository = get(),
+                    onNavigateBack = ::dismissBottomSheet,
+                    onAddLocation = {
+                        bottomSheetPagesNavigation.pop { onNavigateBackTo(0) }
+                    },
+                )
+        }
+
     override fun updateInput(input: String) {
         _input.value = input
     }
@@ -86,11 +126,24 @@ class DefaultLocationSearchComponent(
     }
 
     override fun navigateToLocationWeather(location: LocationInfoShort) {
-        keyLocationMap[location.id]?.let { onNavigateToLocationWeather(it) }
+        keyLocationMap[location.id]?.let { location ->
+            bottomSheetPagesNavigation.pushNew(SearchBottomSheetConfig.LocationWeather(location))
+        }
     }
 
     override fun navigateBack() {
         onNavigateBack()
+    }
+
+    override fun dismissBottomSheet() {
+        bottomSheetPagesNavigation.pop()
+    }
+
+    @Serializable
+    sealed class SearchBottomSheetConfig {
+
+        @Serializable
+        data class LocationWeather(val locationInfo: LocationInfo) : SearchBottomSheetConfig()
     }
 }
 

@@ -62,7 +62,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.sqldelight.native.driver)
-            
+
             api(libs.decompose)
             api(libs.essenty.lifecycle)
             api(libs.essenty.backhandler)

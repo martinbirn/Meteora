@@ -1,35 +1,35 @@
 [
-   {
-      "place_id": 169521494,
-      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-      "osm_type": "way",
-      "osm_id": 100937535,
-      "lat": "51.0999260",
-      "lon": "17.0400160",
-      "class": "building",
-      "type": "yes",
-      "place_rank": 30,
-      "importance": 7.647592889291245e-05,
-      "addresstype": "building",
-      "name": "",
-      "display_name": "7, Plac Konstytucji 3 Maja, Trójkąt, Przedmieście Oławskie, Wrocław, Lower Silesian Voivodeship, 50-083, Poland",
-      "address": {
-         "house_number": "7",
-         "road": "Plac Konstytucji 3 Maja",
-         "quarter": "Trójkąt",
-         "suburb": "Przedmieście Oławskie",
-         "city": "Wroclaw",
-         "state": "Lower Silesian Voivodeship",
-         "ISO3166-2-lvl4": "PL-02",
-         "postcode": "50-083",
-         "country": "Poland",
-         "country_code": "pl"
-      },
-      "boundingbox": [
-         "51.0998369",
-         "51.1000150",
-         "17.0398766",
-         "17.0401553"
-      ]
-   }
+    {
+        "place_id": 169521494,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 100937535,
+        "lat": "51.0999260",
+        "lon": "17.0400160",
+        "class": "building",
+        "type": "yes",
+        "place_rank": 30,
+        "importance": 7.647592889291245e-05,
+        "addresstype": "building",
+        "name": "",
+        "display_name": "7, Plac Konstytucji 3 Maja, Trójkąt, Przedmieście Oławskie, Wrocław, Lower Silesian Voivodeship, 50-083, Poland",
+        "address": {
+            "house_number": "7",
+            "road": "Plac Konstytucji 3 Maja",
+            "quarter": "Trójkąt",
+            "suburb": "Przedmieście Oławskie",
+            "city": "Wroclaw",
+            "state": "Lower Silesian Voivodeship",
+            "ISO3166-2-lvl4": "PL-02",
+            "postcode": "50-083",
+            "country": "Poland",
+            "country_code": "pl"
+        },
+        "boundingbox": [
+            "51.0998369",
+            "51.1000150",
+            "17.0398766",
+            "17.0401553"
+        ]
+    }
 ]

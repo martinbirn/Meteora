@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +41,8 @@ import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
 import org.meteora.presentation.decompose.LocationSearchComponent
 import org.meteora.presentation.decompose.LocationSearchUiState
+import org.meteora.presentation.decompose.bottomsheet.MeteoraBottomSheetContent
+import org.meteora.presentation.decompose.bottomsheet.pages.ChildPagesModalBottomSheet
 import org.meteora.presentation.icon.MeteoraIcons
 import org.meteora.presentation.icon.Search
 import org.meteora.presentation.icon.XCircle
@@ -52,21 +58,33 @@ fun LocationSearchScreen(
     component: LocationSearchComponent,
     modifier: Modifier = Modifier,
 ) {
-    val screenState = component.uiState.collectAsState()
+    Box {
+        val screenState = component.uiState.collectAsState()
 
-    LocationSearchContentScreen(
-        screenState = screenState,
-        inputState = component.inputText.collectAsState(),
-        modifier = modifier,
-        onSearchInputChanged = component::updateInput,
-        onClearInputClicked = component::clearInput,
-        onLocationClicked = component::navigateToLocationWeather,
-        onCancelClicked = component::navigateBack
-    )
+        ScreenContent(
+            screenState = screenState,
+            inputState = component.inputText.collectAsState(),
+            modifier = modifier,
+            onSearchInputChanged = component::updateInput,
+            onClearInputClicked = component::clearInput,
+            onLocationClicked = component::navigateToLocationWeather,
+            onCancelClicked = component::navigateBack
+        )
+
+        ChildPagesModalBottomSheet(
+            sheetContentPagesState = component.bottomSheetPages,
+            onDismiss = component::dismissBottomSheet,
+            containerColor = Color.Transparent,
+            dragHandle = {},
+            contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Top) },
+        ) { component ->
+            MeteoraBottomSheetContent(component)
+        }
+    }
 }
 
 @Composable
-private fun LocationSearchContentScreen(
+private fun ScreenContent(
     screenState: State<LocationSearchUiState>,
     inputState: State<String>,
     modifier: Modifier = Modifier,
@@ -218,7 +236,7 @@ private fun PreviewLocationSearchContentScreen() {
             contentAlignment = Alignment.TopCenter
         ) {
             PreviewSharedLayout {
-                LocationSearchContentScreen(
+                ScreenContent(
                     screenState = screenState,
                     inputState = inputState,
                     onSearchInputChanged = {},

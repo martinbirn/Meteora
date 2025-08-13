@@ -3,24 +3,18 @@ package org.meteora.presentation.screen.locationweather
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -46,15 +40,7 @@ fun LocationWeatherSheet(
     component: LocationWeatherSheetComponent,
     modifier: Modifier = Modifier,
 ) {
-    ComponentModalBottomSheet(
-        sheetContentComponentState = rememberUpdatedState(component),
-        onDismiss = component::navigateBack,
-        modifier = modifier,
-        containerColor = Color.Transparent,
-        dragHandle = {},
-        contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Top) },
-        properties = ModalBottomSheetProperties(false)
-    ) {
+    Column {
         Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
         LocationWeatherScreen(
             component = component.weatherComponent,
