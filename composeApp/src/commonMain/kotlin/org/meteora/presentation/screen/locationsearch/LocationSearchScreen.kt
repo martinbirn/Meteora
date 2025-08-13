@@ -1,33 +1,24 @@
 package org.meteora.presentation.screen.locationsearch
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -36,103 +27,49 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
+import org.meteora.presentation.decompose.LocationSearchComponent
+import org.meteora.presentation.decompose.LocationSearchUiState
 import org.meteora.presentation.icon.MeteoraIcons
 import org.meteora.presentation.icon.Search
 import org.meteora.presentation.icon.XCircle
 import org.meteora.presentation.resources.Res
-import org.meteora.presentation.resources.add
 import org.meteora.presentation.resources.cancel
 import org.meteora.presentation.resources.search_location_placeholder
-import org.meteora.presentation.screen.locationweather.LocationWeatherScreen
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.preview.PreviewSharedLayout
 
 @Composable
 fun LocationSearchScreen(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    navigateBack: () -> Unit
+    component: LocationSearchComponent,
+    modifier: Modifier = Modifier,
 ) {
-    val viewModel: LocationSearchViewModel = koinViewModel()
-    val screenState = viewModel.state.collectAsState()
+    val screenState = component.uiState.collectAsState()
 
-    sharedTransitionScope.LocationSearchContentScreen(
-        animatedContentScope = animatedContentScope,
+    LocationSearchContentScreen(
         screenState = screenState,
-        inputState = viewModel.inputText.collectAsState(),
-        onSearchInputChanged = viewModel::updateInput,
-        onClearInputClicked = viewModel::clearInput,
-        onLocationClicked = viewModel::showLocation,
-        onCancelClicked = navigateBack
+        inputState = component.inputText.collectAsState(),
+        modifier = modifier,
+        onSearchInputChanged = component::updateInput,
+        onClearInputClicked = component::clearInput,
+        onLocationClicked = component::navigateToLocationWeather,
+        onCancelClicked = component::navigateBack
     )
-
-    screenState.value.selectedLocation?.let { location ->
-        ModalBottomSheet(
-            onDismissRequest = viewModel::hideLocation,
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = Color.Transparent,
-            dragHandle = {},
-            contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Top) },
-            properties = ModalBottomSheetProperties(false)
-        ) {
-            Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
-            LocationWeatherScreen(
-                modifier = Modifier.clip(
-                    shape = MeteoraTheme.shape
-                ),
-                locationInfo = location,
-                header = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(resource = Res.string.cancel),
-                            modifier = Modifier
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null,
-                                    onClick = viewModel::hideLocation
-                                )
-                                .padding(vertical = 12.dp),
-                            style = LocalTextStyle.current
-                        )
-                        Text(
-                            text = stringResource(resource = Res.string.add),
-                            modifier = Modifier
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null,
-                                    onClick = { viewModel.addLocation(locationInfo = location) }
-                                )
-                                .padding(vertical = 12.dp),
-                            fontWeight = FontWeight.Bold,
-                            style = LocalTextStyle.current
-                        )
-                    }
-                }
-            )
-        }
-    }
 }
 
 @Composable
-private fun SharedTransitionScope.LocationSearchContentScreen(
-    animatedContentScope: AnimatedContentScope,
-    screenState: State<LocationSearchViewModel.State>,
+private fun LocationSearchContentScreen(
+    screenState: State<LocationSearchUiState>,
     inputState: State<String>,
+    modifier: Modifier = Modifier,
     onSearchInputChanged: (String) -> Unit,
     onClearInputClicked: () -> Unit,
     onLocationClicked: (LocationInfoShort) -> Unit,
@@ -144,7 +81,13 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
         focusRequester.requestFocus()
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+            .systemBarsPadding()
+            .navigationBarsPadding()
+    ) {
         Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -155,10 +98,6 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                 onValueChange = onSearchInputChanged,
                 modifier = Modifier
                     .weight(1f)
-                    .sharedElement(
-                        sharedContentState = rememberSharedContentState(key = "search-text"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
                     .padding(start = MeteoraTheme.dimen.horizontalPadding),
                 placeholder = stringResource(resource = Res.string.search_location_placeholder),
                 leadingIcon = {
@@ -185,10 +124,6 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
             Text(
                 text = stringResource(resource = Res.string.cancel),
                 modifier = Modifier
-                    .sharedElement(
-                        sharedContentState = rememberSharedContentState(key = "cancel-button"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
                     .padding(end = MeteoraTheme.dimen.horizontalPadding)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -199,24 +134,24 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
             )
         }
         Spacer(modifier = Modifier.height(height = 12.dp))
-        when (val searchState = screenState.value.searchState) {
-            LocationSearchState.Idle -> {
+        when (val searchState = screenState.value) {
+            is LocationSearchUiState.Idle -> {
 
             }
 
-            LocationSearchState.Loading -> {
+            is LocationSearchUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
 
-            is LocationSearchState.Error -> {
+            is LocationSearchUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(text = "Error :(${searchState.throwable.message})")
                 }
             }
 
-            LocationSearchState.NoResult -> {
+            LocationSearchUiState.NoResult -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = "No results for \"${inputState.value}\"",
@@ -225,7 +160,7 @@ private fun SharedTransitionScope.LocationSearchContentScreen(
                 }
             }
 
-            is LocationSearchState.Content -> {
+            is LocationSearchUiState.Content -> {
                 SearchResultList(items = searchState.locations, onItemClicked = onLocationClicked)
             }
         }
@@ -264,7 +199,7 @@ private fun SearchResultList(
 private fun PreviewLocationSearchContentScreen() {
     MeteoraTheme {
         val screenState = remember {
-            mutableStateOf(LocationSearchViewModel.State())
+            mutableStateOf(LocationSearchUiState.Idle)
         }
         val inputState = remember {
             mutableStateOf("")
@@ -284,7 +219,6 @@ private fun PreviewLocationSearchContentScreen() {
         ) {
             PreviewSharedLayout {
                 LocationSearchContentScreen(
-                    animatedContentScope = it,
                     screenState = screenState,
                     inputState = inputState,
                     onSearchInputChanged = {},

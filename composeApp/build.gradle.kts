@@ -25,12 +25,15 @@ kotlin {
         freeCompilerArgs.addAll(
             "-Xexpect-actual-classes",
             "-opt-in=kotlin.uuid.ExperimentalUuidApi",
+            "-opt-in=kotlin.time.ExperimentalTime",
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi",
             "-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi",
             "-opt-in=dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi",
+            "-opt-in=com.arkivanov.decompose.DelicateDecomposeApi",
+            "-opt-in=com.arkivanov.decompose.ExperimentalDecomposeApi",
         )
     }
 
@@ -42,6 +45,10 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+
+            export(libs.decompose)
+            export(libs.essenty.lifecycle)
+            export(libs.essenty.backhandler)
         }
     }
 
@@ -55,9 +62,14 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             implementation(libs.sqldelight.native.driver)
+            
+            api(libs.decompose)
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.backhandler)
         }
         commonMain.dependencies {
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.ui)
@@ -79,7 +91,6 @@ kotlin {
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.koin.compose.viewmodel.navigation)
 
             implementation(libs.coil.compose)
             implementation(libs.coil.ktor)
@@ -87,9 +98,11 @@ kotlin {
             implementation(libs.haze)
             implementation(libs.haze.materials)
 
-            implementation(libs.skiko)
-
-            implementation(libs.navigation.compose)
+            implementation(libs.decompose.compose)
+            implementation(libs.decompose.compose.experimental)
+            api(libs.decompose)
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.backhandler)
 
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)

@@ -1,11 +1,10 @@
 package org.meteora.presentation.screen.locations
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,7 +17,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -29,19 +30,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
-import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.entity.WeatherInfoShort
+import org.meteora.presentation.component.CollapsibleTopAppBar
 import org.meteora.presentation.component.SearchTextField
+import org.meteora.presentation.decompose.LocationsComponent
+import org.meteora.presentation.decompose.LocationsUiState
 import org.meteora.presentation.icon.MeteoraIcons
 import org.meteora.presentation.icon.Search
 import org.meteora.presentation.resources.Res
@@ -53,92 +59,130 @@ import org.meteora.presentation.util.formatter.hourMinuteFormatter
 import org.meteora.presentation.util.preview.PreviewSharedLayout
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 import org.meteora.presentation.util.status
+import kotlin.time.Instant
 
 @Composable
 fun LocationsScreen(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    navigateToLocationSearch: () -> Unit,
-    navigateToLocationWeather: (LocationInfo) -> Unit
+    component: LocationsComponent,
+    modifier: Modifier = Modifier,
 ) {
-    val viewModel: LocationsViewModel = koinViewModel()
-
-    sharedTransitionScope.LocationsScreenContent(
-        animatedContentScope = animatedContentScope,
-        screenState = viewModel.state.collectAsState(),
-        onSearchClicked = navigateToLocationSearch,
+    LocationsScreenContent(
+        screenState = component.uiState.collectAsState(),
+        modifier = modifier,
+        onSearchClicked = component::navigateToLocationSearch,
         onWeatherClicked = { key ->
-            val locationInfo = viewModel.getLocationInfoByKey(key) ?: return@LocationsScreenContent
-            navigateToLocationWeather(locationInfo)
+            val locationInfo = component.getLocationInfoByKey(key) ?: return@LocationsScreenContent
+            component.navigateToLocationWeather(locationInfo)
         }
     )
 }
 
 @Composable
-private fun SharedTransitionScope.LocationsScreenContent(
-    animatedContentScope: AnimatedContentScope,
-    screenState: State<LocationsViewModel.State>,
+private fun LocationsScreenContent(
+    screenState: State<LocationsUiState>,
+    modifier: Modifier = Modifier,
     onSearchClicked: () -> Unit,
     onWeatherClicked: (String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
-        Text(
-            text = stringResource(resource = Res.string.weather),
-            modifier = Modifier.padding(horizontal = MeteoraTheme.dimen.horizontalPadding),
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(modifier = Modifier.height(height = 8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SearchTextField(
-                value = "",
-                onValueChange = {},
-                modifier = Modifier
-                    .weight(weight = 1f)
-                    .sharedElement(
-                        sharedContentState = rememberSharedContentState(key = "search-text"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
-                    .padding(start = MeteoraTheme.dimen.horizontalPadding),
-                readOnly = true,
-                onClickWhenReadOnly = onSearchClicked,
-                placeholder = stringResource(resource = Res.string.search_location_placeholder),
-                leadingIcon = {
-                    Icon(
-                        imageVector = MeteoraIcons.Search,
-                        contentDescription = "Search",
-                        tint = MeteoraColor.White50
-                    )
-                },
-            )
+    val hazeState = rememberHazeState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-            // empty shared element
-            Spacer(
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            CollapsibleTopAppBar(
+                title = stringResource(resource = Res.string.weather),
+                searchField = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SearchTextField(
+                            value = "",
+                            onValueChange = {},
+                            modifier = Modifier
+                                .weight(weight = 1f)
+                                .padding(start = MeteoraTheme.dimen.horizontalPadding),
+                            readOnly = true,
+                            onClickWhenReadOnly = onSearchClicked,
+                            placeholder = stringResource(resource = Res.string.search_location_placeholder),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = MeteoraIcons.Search,
+                                    contentDescription = "Search",
+                                    tint = MeteoraColor.White50
+                                )
+                            },
+                        )
+
+                        // empty shared element
+                        Spacer(
+                            modifier = Modifier
+                                .padding(end = MeteoraTheme.dimen.horizontalPadding)
+                                .width(0.dp)
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
                 modifier = Modifier
-                    .sharedElement(
-                        sharedContentState = rememberSharedContentState(key = "cancel-button"),
-                        animatedVisibilityScope = animatedContentScope
-                    )
-                    .padding(end = MeteoraTheme.dimen.horizontalPadding)
-                    .width(0.dp)
+                    .hazeEffect(
+                        state = hazeState,
+                        style = HazeMaterials.regular(containerColor = MeteoraColor.Black30)
+                    ),
+                expandedHeight = 48.dp
             )
         }
-        Spacer(modifier = Modifier.height(height = 12.dp))
-        when (val locationsState = screenState.value.locationsState) {
-            LocationsState.Empty -> {
-
+    ) { innerPadding ->
+        when (val locationsState = screenState.value) {
+            is LocationsUiState.Empty -> {
+                Spacer(modifier = Modifier.fillMaxSize())
             }
 
-            is LocationsState.Content -> {
+            is LocationsUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Loading",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+
+            is LocationsUiState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = locationsState.throwable.message.orEmpty(),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+
+            is LocationsUiState.Content -> {
                 val weathers = remember(locationsState.weathers) { locationsState.weathers }
                 LazyColumn(
-                    modifier = Modifier.padding(horizontal = MeteoraTheme.dimen.horizontalPadding)
+                    modifier = Modifier
+                        .hazeSource(hazeState)
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    contentPadding = PaddingValues(
+                        start = MeteoraTheme.dimen.horizontalPadding,
+                        // cause recompositions, but supports transparent toolbar behavior on scroll
+                        top = innerPadding.calculateTopPadding(),
+                        end = MeteoraTheme.dimen.horizontalPadding,
+                        bottom = MeteoraTheme.dimen.verticalPadding
+                    )
                 ) {
-                    items(count = weathers.size) { index ->
+                    items(
+                        count = weathers.size,
+                        key = { weathers[it].key }
+                    ) { index ->
                         val weather = weathers[index]
                         LocationItemContent(
                             weatherInfo = weather,
@@ -147,27 +191,6 @@ private fun SharedTransitionScope.LocationsScreenContent(
                         )
                     }
                 }
-            }
-
-            is LocationsState.Error -> {
-                Text(
-                    text = locationsState.throwable.message.orEmpty(),
-                    modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .padding(top = MeteoraTheme.dimen.verticalPadding),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-
-            LocationsState.Loading -> {
-                // add shimmers
-                Text(
-                    text = "Loading",
-                    modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .padding(top = MeteoraTheme.dimen.verticalPadding),
-                    style = MaterialTheme.typography.titleLarge
-                )
             }
         }
     }
@@ -189,7 +212,7 @@ private fun LocationItemContent(
         modifier = modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(color = MeteoraColor.Black30, shape = shape)
+            .background(color = MeteoraColor.DarkSkyBlue, shape = shape)
             .clip(shape = shape)
             .clickable { onClick(weatherInfo.key) }
             .padding(all = 12.dp)
@@ -249,12 +272,10 @@ private fun PreviewLocationsScreenContent(
     MeteoraTheme {
         val screenState = remember {
             mutableStateOf(
-                LocationsViewModel.State(
-                    locationsState = LocationsState.Content(
-                        weathers = weathers.map {
-                            it.toShortInfo(key = it.hashCode().toString())
-                        }.toList()
-                    )
+                LocationsUiState.Content(
+                    weathers = weathers.map {
+                        it.toShortInfo(key = it.hashCode().toString())
+                    }.toList()
                 )
             )
         }
@@ -273,7 +294,6 @@ private fun PreviewLocationsScreenContent(
         ) {
             PreviewSharedLayout {
                 LocationsScreenContent(
-                    animatedContentScope = it,
                     screenState = screenState,
                     onSearchClicked = {},
                     onWeatherClicked = {}

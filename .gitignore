@@ -46,3 +46,5 @@ xcuserdata
 *.mdc
 **/build/
 !src/**/build/
+
+.claude/

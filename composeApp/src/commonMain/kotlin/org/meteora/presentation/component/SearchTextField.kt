@@ -74,7 +74,7 @@ fun SearchTextField(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
                     .background(
-                        color = MeteoraColor.Black50,
+                        color = MeteoraColor.White30,
                         shape = shape
                     )
                     .clip(shape = shape)

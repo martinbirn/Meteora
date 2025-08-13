@@ -1,6 +1,6 @@
 package org.meteora.domain.entity
 
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 typealias WeatherCode = Int
 typealias DirectionAngle = Int

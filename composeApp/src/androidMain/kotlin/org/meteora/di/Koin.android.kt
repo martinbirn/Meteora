@@ -5,6 +5,8 @@ import org.koin.dsl.module
 import org.meteora.cache.AndroidDatabaseDriverFactory
 import org.meteora.cache.DatabaseDriverFactory
 
-val databaseModule = module {
-    single<DatabaseDriverFactory> { AndroidDatabaseDriverFactory(context = androidContext()) }
+actual fun platformModule() = module {
+    single<DatabaseDriverFactory> {
+        AndroidDatabaseDriverFactory(context = androidContext())
+    }
 }

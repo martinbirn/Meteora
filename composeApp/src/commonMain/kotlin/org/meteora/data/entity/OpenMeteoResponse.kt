@@ -1,6 +1,5 @@
 package org.meteora.data.entity
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
@@ -11,6 +10,7 @@ import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.util.formatter.dayOfWeekFormatter
+import kotlin.time.Instant
 
 @Serializable
 data class OpenMeteoResponse(

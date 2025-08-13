@@ -13,37 +13,37 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 
 [versions]
 
-agp = "8.10.0"
-android-compileSdk = "35"
+agp = "8.12.0"
+android-compileSdk = "36"
 android-minSdk = "26"
-android-targetSdk = "35"
+android-targetSdk = "36"
 androidx-activity-compose = "1.10.1"
-androidx-appcompat = "1.7.0"
+androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
 androidx-core-ktx = "1.16.0"
-androidx-test-core = "1.6.1"
-androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.9.0"
+androidx-espresso-core = "3.7.0"
+androidx-lifecycle = "2.9.1"
 androidx-material = "1.12.0"
-androidx-test-junit = "1.2.1"
-compose-multiplatform = "1.8.1"
-junit = "4.13.2"
-kotlin = "2.1.21"
-ktor = "3.1.3"
+androidx-test-core = "1.7.0"
+androidx-test-junit = "1.3.0"
+build-konfig = "0.17.1"
+coil = "3.3.0"
+compose-multiplatform = "1.8.2"
 coroutines = "1.10.2"
+datetime = "0.7.1"
+decompose = "3.3.0"
+essenty = "2.5.0"
+haze = "1.6.9"
+junit = "4.13.2"
+koin = "4.1.0"
+kotlin = "2.2.0"
+ktor = "3.2.3"
 moko-geo = "0.8.0"
 moko-permissions = "0.19.1"
-koin = "4.1.0-RC1"
-build-konfig = "0.17.1"
 napier = "2.7.1"
-coil = "3.2.0"
-datetime = "0.6.2"
-haze = "1.6.2"
-skiko = "0.9.4.2"
-navigation = "2.9.0-beta02"
+robolectric = "4.15.1"
 sqlDelight = "2.1.0"
-window-size = "1.8.1"
-robolectric = "4.14.1"
+window-size = "1.8.2"
 
 [libraries]
 
@@ -98,9 +98,11 @@ coil-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coi
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 
-skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
-
-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+decompose-compose-experimental = { module = "com.arkivanov.decompose:extensions-compose-experimental", version.ref = "decompose" }
+essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-backhandler = { module = "com.arkivanov.essenty:back-handler", version.ref = "essenty" }
 
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }

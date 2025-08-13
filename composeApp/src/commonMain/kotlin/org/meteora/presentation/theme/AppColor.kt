@@ -43,6 +43,9 @@ object MeteoraColor {
     val UvHigh = Color(0xFFFF9800)
     val UvVeryHigh = Color(0xFFF44336)
     val UvExtreme = Color(0xFF9C27B0)
+    val SkyBlue = Color(0xFF87CEEB)
+    val DarkSkyBlue = Color(0xFF202740)
+    val Purple = Color(0xff583e71)
 }
 
 val MeteoraMaterialDarkColors = darkColorScheme(
@@ -52,8 +55,8 @@ val MeteoraMaterialDarkColors = darkColorScheme(
     onPrimaryContainer = MeteoraColor.White20,
     secondary = MeteoraColor.White50,
     onSecondary = MeteoraColor.LightShade,
-    background = MeteoraColor.White,
-    onBackground = MeteoraColor.Black,
+    background = MeteoraColor.Black,
+    onBackground = MeteoraColor.White,
     error = MeteoraColor.Red,
     onError = MeteoraColor.White,
     surface = MeteoraColor.Gray,

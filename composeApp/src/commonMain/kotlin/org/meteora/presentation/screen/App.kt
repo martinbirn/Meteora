@@ -1,50 +1,35 @@
 package org.meteora.presentation.screen
 
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.unit.IntOffset
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.Uri
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
+import com.arkivanov.decompose.extensions.compose.experimental.stack.ChildStack
 import dev.chrisbanes.haze.rememberHazeState
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.compose.koinInject
-import org.meteora.domain.entity.LocationInfo
-import org.meteora.domain.entity.LocationInfoNavType
 import org.meteora.logging.AppLogger
 import org.meteora.logging.CoilLogger
+import org.meteora.presentation.decompose.AppComponent
+import org.meteora.presentation.decompose.AppComponent.Child
+import org.meteora.presentation.decompose.DefaultAppComponent
 import org.meteora.presentation.screen.locations.LocationsScreen
 import org.meteora.presentation.screen.locationsearch.LocationSearchScreen
 import org.meteora.presentation.screen.locationweather.LocationWeatherScreen
+import org.meteora.presentation.screen.locationweather.LocationWeatherSheet
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.LocalHazeState
-import kotlin.reflect.typeOf
+import org.meteora.presentation.util.backAnimation
 
 @Composable
-fun App() {
-    val appLogger = koinInject<AppLogger>()
+fun App(component: DefaultAppComponent) {
     key(Unit) {
-        appLogger.setup()
+        koinInject<AppLogger>().setup()
     }
     val httpClient = koinInject<HttpClient>()
     setSingletonImageLoaderFactory { context ->
@@ -66,78 +51,34 @@ fun App() {
     MeteoraTheme {
         val hazeState = rememberHazeState()
         CompositionLocalProvider(LocalHazeState provides hazeState) {
-            Box(
+            /*Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color(0xFF8780A3),
-                                Color(0xFFaeaabf)
-                            )
-                        )
-                    )
                     //.hazeSource(state = hazeState) TODO: add when background ready
                     //.shaderEffect(ShaderOptions.SNOW)
                     .systemBarsPadding()
                     .navigationBarsPadding()
-            ) {
-                SharedTransitionLayout {
-                    val navController = rememberNavController()
-                    val animationSpec = tween<IntOffset>(700)
-                    val keyboardController = LocalSoftwareKeyboardController.current
-                    NavHost(
-                        navController = navController,
-                        startDestination = LocationsDestination,
-                        modifier = Modifier.fillMaxSize(),
-                        enterTransition = {
-                            slideIntoContainer(SlideDirection.Left, animationSpec)
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(SlideDirection.Left, animationSpec)
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(SlideDirection.Right, animationSpec)
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(SlideDirection.Right, animationSpec)
-                        }
-                    ) {
-                        composable<LocationsDestination> {
-                            LocationsScreen(
-                                sharedTransitionScope = this@SharedTransitionLayout,
-                                animatedContentScope = this@composable,
-                                navigateToLocationSearch = {
-                                    keyboardController?.hide()
-                                    navController.navigate(SearchLocationDestination)
-                                },
-                                navigateToLocationWeather = { locationInfo ->
-                                    keyboardController?.hide()
-                                    navController.navigate(
-                                        route = LocationWeatherDestination(locationInfo = locationInfo)
-                                    )
-                                },
-                            )
-                        }
-                        composable<LocationWeatherDestination>(
-                            typeMap = mapOf(typeOf<LocationInfo>() to LocationInfoNavType)
-                        ) { backStackEntry ->
-                            val route = backStackEntry.toRoute<LocationWeatherDestination>()
-                            LocationWeatherScreen(locationInfo = route.locationInfo)
-                        }
-                        composable<SearchLocationDestination> {
-                            LocationSearchScreen(
-                                sharedTransitionScope = this@SharedTransitionLayout,
-                                animatedContentScope = this@composable,
-                                navigateBack = {
-                                    keyboardController?.hide()
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            ) {*/
+            AppView(component)
+            //}
+        }
+    }
+}
+
+@Composable
+fun AppView(component: AppComponent) {
+    ChildStack(
+        stack = component.stack,
+        animation = backAnimation(
+            backHandler = component.backHandler,
+            onBack = component::onBackClicked,
+        ),
+    ) {
+        when (val child = it.instance) {
+            is Child.Locations -> LocationsScreen(child.component)
+            is Child.LocationSearch -> LocationSearchScreen(child.component)
+            is Child.LocationWeather -> LocationWeatherScreen(child.component)
+            is Child.LocationWeatherSheet -> LocationWeatherSheet(child.component)
         }
     }
 }

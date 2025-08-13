@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -45,10 +48,9 @@ import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
-import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
+import org.meteora.presentation.decompose.LocationWeatherComponent
+import org.meteora.presentation.decompose.LocationWeatherUiState
 import org.meteora.presentation.screen.locationweather.component.DailyForecastCard
 import org.meteora.presentation.screen.locationweather.component.FeelsLikeCard
 import org.meteora.presentation.screen.locationweather.component.HourlyForecastCard
@@ -58,6 +60,7 @@ import org.meteora.presentation.screen.locationweather.component.SunCard
 import org.meteora.presentation.screen.locationweather.component.UvIndexCard
 import org.meteora.presentation.screen.locationweather.component.VisibilityCard
 import org.meteora.presentation.screen.locationweather.component.WindCard
+import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.description
 import org.meteora.presentation.util.preview.WeatherInfoParameters
@@ -68,14 +71,11 @@ enum class WeatherSection {
 
 @Composable
 fun LocationWeatherScreen(
+    component: LocationWeatherComponent,
     modifier: Modifier = Modifier,
-    locationInfo: LocationInfo? = null,
     header: @Composable () -> Unit = {}
 ) {
-    val viewModel: LocationWeatherViewModel = koinInject {
-        parametersOf(locationInfo)
-    }
-    if (locationInfo == null) {
+    if (component.initialLocation == null) {
         val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
         val permissionsController: PermissionsController = remember(permissionFactory) {
             permissionFactory.createPermissionsController()
@@ -91,18 +91,18 @@ fun LocationWeatherScreen(
         BindLocationTrackerEffect(locationTracker)
 
         LaunchedEffect(Unit) {
-            viewModel.startTracking(locationTracker)
+            component.startTracking(locationTracker)
         }
 
         DisposableEffect(Unit) {
             onDispose {
-                viewModel.stopTracking()
+                component.stopTracking()
             }
         }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.refresh()
+        component.refresh()
     }
 
     Column(
@@ -111,16 +111,22 @@ fun LocationWeatherScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF8780A3),
-                        Color(0xFFaeaabf)
+                        MeteoraColor.DarkSkyBlue,
+                        MeteoraColor.Purple
                     )
                 )
             )
-            .padding(horizontal = MeteoraTheme.dimen.horizontalPadding),
+            //.systemBarsPadding()
+            .statusBarsPadding()
+            .padding(
+                start = MeteoraTheme.dimen.horizontalPadding,
+                top = MeteoraTheme.dimen.verticalPadding,
+                end = MeteoraTheme.dimen.horizontalPadding
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         header()
-        val screenState by viewModel.state.collectAsState()
+        val screenState by component.weatherState.collectAsState()
         LocationWeatherScreenContent(
             screenState = screenState
         )
@@ -129,15 +135,15 @@ fun LocationWeatherScreen(
 
 @Composable
 private fun LocationWeatherScreenContent(
-    screenState: LocationWeatherViewModel.State
+    screenState: LocationWeatherUiState
 ) {
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val size = with(density) { windowInfo.containerSize.toSize().toDpSize() }
     val windowSize = remember(size) { WindowSizeClass.calculateFromSize(size) }
 
-    when (val weatherState = screenState.weatherState) {
-        is LocationWeatherState.Init -> {
+    when (val weatherState = screenState) {
+        is LocationWeatherUiState.Init -> {
             Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
             Text(
                 text = "${weatherState.locationInfo.locality}, ${weatherState.locationInfo.country}",
@@ -151,7 +157,23 @@ private fun LocationWeatherScreenContent(
             )
         }
 
-        is LocationWeatherState.Content -> {
+        is LocationWeatherUiState.Loading -> {
+            Text(
+                text = "Loading",
+                modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+        is LocationWeatherUiState.Error -> {
+            Text(
+                text = weatherState.throwable.message.orEmpty(),
+                modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+        is LocationWeatherUiState.Content -> {
             Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
             Text(
                 text = "${weatherState.weatherInfo.locationInfo.locality}, ${weatherState.weatherInfo.locationInfo.country}",
@@ -247,25 +269,9 @@ private fun LocationWeatherScreenContent(
                         humidity = weatherState.weatherInfo.main.humidity,
                         modifier = Modifier.width(width = singleWidth),
                     )
-                    Spacer(modifier = Modifier.height(height = MeteoraTheme.dimen.verticalPadding))
+                    Spacer(modifier = Modifier.navigationBarsPadding())
                 }
             }
-        }
-
-        is LocationWeatherState.Error -> {
-            Text(
-                text = weatherState.throwable.message.orEmpty(),
-                modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
-                style = MaterialTheme.typography.titleLarge
-            )
-        }
-
-        LocationWeatherState.Loading -> {
-            Text(
-                text = "Loading",
-                modifier = Modifier.padding(top = MeteoraTheme.dimen.verticalPadding),
-                style = MaterialTheme.typography.titleLarge
-            )
         }
     }
 }
@@ -296,10 +302,8 @@ private fun PreviewLocationWeatherScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LocationWeatherScreenContent(
-                screenState = LocationWeatherViewModel.State(
-                    weatherState = LocationWeatherState.Content(
-                        weatherInfo = weatherInfo
-                    )
+                screenState = LocationWeatherUiState.Content(
+                    weatherInfo = weatherInfo
                 )
             )
         }

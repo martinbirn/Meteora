@@ -1,12 +1,12 @@
 package org.meteora.presentation.util.preview
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
 import org.meteora.domain.entity.DailyWeatherInfo
 import org.meteora.domain.entity.HourlyWeatherInfo
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.WeatherInfo
+import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
 class WeatherInfoParameters : PreviewParameterProvider<WeatherInfo> {
