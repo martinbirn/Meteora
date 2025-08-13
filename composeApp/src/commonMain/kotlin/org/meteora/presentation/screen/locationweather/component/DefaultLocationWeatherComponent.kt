@@ -1,4 +1,4 @@
-package org.meteora.presentation.decompose
+package org.meteora.presentation.screen.locationweather.component
 
 import com.arkivanov.decompose.ComponentContext
 import dev.icerock.moko.geo.LocationTracker
@@ -13,24 +13,9 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.meteora.domain.entity.LocationInfo
-import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.repository.WeatherApiRepository
+import org.meteora.presentation.screen.locationweather.LocationWeatherUiState
 import org.meteora.util.coroutineScope
-
-interface LocationWeatherComponent {
-    val weatherState: StateFlow<LocationWeatherUiState>
-
-    val initialLocation: LocationInfo?
-
-    // Trigger a manual refresh of weather data
-    fun refresh()
-
-    // Start tracking user location (if initial location not provided)
-    suspend fun startTracking(locationTracker: LocationTracker)
-
-    // Stop location tracking when leaving the screen
-    fun stopTracking()
-}
 
 class DefaultLocationWeatherComponent(
     componentContext: ComponentContext,
@@ -101,11 +86,4 @@ class DefaultLocationWeatherComponent(
                 _weatherState.update { LocationWeatherUiState.Error(ex) }
             }
     }
-}
-
-sealed class LocationWeatherUiState {
-    data class Init(val locationInfo: LocationInfo) : LocationWeatherUiState()
-    object Loading : LocationWeatherUiState()
-    data class Content(val weatherInfo: WeatherInfo) : LocationWeatherUiState()
-    data class Error(val throwable: Throwable) : LocationWeatherUiState()
 }

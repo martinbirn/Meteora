@@ -1,8 +1,8 @@
 package org.meteora.presentation.decompose.bottomsheet
 
 import androidx.compose.runtime.Composable
-import org.meteora.presentation.decompose.LocationWeatherSheetComponent
-import org.meteora.presentation.screen.locationweather.LocationWeatherSheet
+import org.meteora.presentation.screen.locationweathersheet.LocationWeatherSheet
+import org.meteora.presentation.screen.locationweathersheet.component.LocationWeatherSheetComponent
 
 @Composable
 fun MeteoraBottomSheetContent(component: BottomSheetContentComponent) {

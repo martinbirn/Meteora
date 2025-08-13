@@ -21,15 +21,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,17 +42,16 @@ import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.entity.WeatherInfoShort
 import org.meteora.presentation.component.CollapsibleTopAppBar
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.decompose.LocationsComponent
-import org.meteora.presentation.decompose.LocationsUiState
 import org.meteora.presentation.icon.MeteoraIcons
 import org.meteora.presentation.icon.Search
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.search_location_placeholder
 import org.meteora.presentation.resources.weather
+import org.meteora.presentation.screen.locations.component.LocationsComponent
+import org.meteora.presentation.screen.locations.component.PreviewLocationsComponent
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.formatter.hourMinuteFormatter
-import org.meteora.presentation.util.preview.PreviewSharedLayout
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 import org.meteora.presentation.util.status
 import kotlin.time.Instant
@@ -66,24 +61,7 @@ fun LocationsScreen(
     component: LocationsComponent,
     modifier: Modifier = Modifier,
 ) {
-    LocationsScreenContent(
-        screenState = component.uiState.collectAsState(),
-        modifier = modifier,
-        onSearchClicked = component::navigateToLocationSearch,
-        onWeatherClicked = { key ->
-            val locationInfo = component.getLocationInfoByKey(key) ?: return@LocationsScreenContent
-            component.navigateToLocationWeather(locationInfo)
-        }
-    )
-}
-
-@Composable
-private fun LocationsScreenContent(
-    screenState: State<LocationsUiState>,
-    modifier: Modifier = Modifier,
-    onSearchClicked: () -> Unit,
-    onWeatherClicked: (String) -> Unit
-) {
+    val screenState = component.uiState.collectAsState()
     val hazeState = rememberHazeState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -106,7 +84,7 @@ private fun LocationsScreenContent(
                                 .weight(weight = 1f)
                                 .padding(start = MeteoraTheme.dimen.horizontalPadding),
                             readOnly = true,
-                            onClickWhenReadOnly = onSearchClicked,
+                            onClickWhenReadOnly = component::navigateToLocationSearch,
                             placeholder = stringResource(resource = Res.string.search_location_placeholder),
                             leadingIcon = {
                                 Icon(
@@ -187,7 +165,11 @@ private fun LocationsScreenContent(
                         LocationItemContent(
                             weatherInfo = weather,
                             modifier = Modifier,
-                            onClick = onWeatherClicked
+                            onClick = { key ->
+                                val locationInfo = component.getLocationInfoByKey(key)
+                                    ?: return@LocationItemContent
+                                component.navigateToLocationWeather(locationInfo)
+                            }
                         )
                     }
                 }
@@ -264,41 +246,10 @@ private fun LocationItemContent(
 
 @Preview
 @Composable
-private fun PreviewLocationsScreenContent(
-    // @PreviewParameter is broken on my AS version (https://youtrack.jetbrains.com/issue/KMT-879)
-    // @PreviewParameter(WeatherInfoParameters::class)
+private fun LocationsScreenPreview(
     weathers: Sequence<WeatherInfo> = WeatherInfoParameters().values
 ) {
     MeteoraTheme {
-        val screenState = remember {
-            mutableStateOf(
-                LocationsUiState.Content(
-                    weathers = weathers.map {
-                        it.toShortInfo(key = it.hashCode().toString())
-                    }.toList()
-                )
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF8780A3),
-                            Color(0xFFaeaabf)
-                        )
-                    )
-                ),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            PreviewSharedLayout {
-                LocationsScreenContent(
-                    screenState = screenState,
-                    onSearchClicked = {},
-                    onWeatherClicked = {}
-                )
-            }
-        }
+        LocationsScreen(PreviewLocationsComponent(weathers))
     }
 }

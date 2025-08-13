@@ -1,4 +1,4 @@
-package org.meteora.presentation.decompose
+package org.meteora.presentation.screen.locations.component
 
 import com.arkivanov.decompose.ComponentContext
 import io.github.aakira.napier.Napier
@@ -12,17 +12,9 @@ import org.meteora.domain.entity.WeatherInfo
 import org.meteora.domain.entity.WeatherInfoShort
 import org.meteora.domain.repository.WeatherApiRepository
 import org.meteora.domain.repository.WeatherLocalRepository
+import org.meteora.presentation.screen.locations.LocationsUiState
 import org.meteora.util.coroutineScope
 import kotlin.uuid.Uuid
-
-interface LocationsComponent {
-    val uiState: StateFlow<LocationsUiState>
-
-    fun getLocationInfoByKey(key: String): LocationInfo?
-
-    fun navigateToLocationSearch()
-    fun navigateToLocationWeather(locationInfo: LocationInfo)
-}
 
 class DefaultLocationsComponent(
     componentContext: ComponentContext,
@@ -80,11 +72,4 @@ class DefaultLocationsComponent(
     override fun navigateToLocationWeather(locationInfo: LocationInfo) {
         onNavigateToLocationWeather(locationInfo)
     }
-}
-
-sealed class LocationsUiState {
-    object Empty : LocationsUiState()
-    object Loading : LocationsUiState()
-    data class Error(val throwable: Throwable) : LocationsUiState()
-    data class Content(val weathers: List<WeatherInfoShort>) : LocationsUiState()
 }

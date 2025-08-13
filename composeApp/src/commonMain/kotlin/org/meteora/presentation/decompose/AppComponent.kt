@@ -15,6 +15,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.presentation.decompose.AppComponent.Child
+import org.meteora.presentation.screen.locations.component.DefaultLocationsComponent
+import org.meteora.presentation.screen.locationsearch.component.DefaultLocationSearchComponent
+import org.meteora.presentation.screen.locationweather.component.DefaultLocationWeatherComponent
 
 interface AppComponent : BackHandlerOwner {
     val stack: Value<ChildStack<*, Child>>

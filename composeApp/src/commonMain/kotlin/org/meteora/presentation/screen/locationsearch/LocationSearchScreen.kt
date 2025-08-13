@@ -25,22 +25,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.presentation.component.SearchTextField
-import org.meteora.presentation.decompose.LocationSearchComponent
-import org.meteora.presentation.decompose.LocationSearchUiState
 import org.meteora.presentation.decompose.bottomsheet.MeteoraBottomSheetContent
 import org.meteora.presentation.decompose.bottomsheet.pages.ChildPagesModalBottomSheet
 import org.meteora.presentation.icon.MeteoraIcons
@@ -49,9 +44,10 @@ import org.meteora.presentation.icon.XCircle
 import org.meteora.presentation.resources.Res
 import org.meteora.presentation.resources.cancel
 import org.meteora.presentation.resources.search_location_placeholder
+import org.meteora.presentation.screen.locationsearch.component.LocationSearchComponent
+import org.meteora.presentation.screen.locationsearch.component.PreviewLocationSearchComponent
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
-import org.meteora.presentation.util.preview.PreviewSharedLayout
 
 @Composable
 fun LocationSearchScreen(
@@ -59,16 +55,9 @@ fun LocationSearchScreen(
     modifier: Modifier = Modifier,
 ) {
     Box {
-        val screenState = component.uiState.collectAsState()
-
         ScreenContent(
-            screenState = screenState,
-            inputState = component.inputText.collectAsState(),
-            modifier = modifier,
-            onSearchInputChanged = component::updateInput,
-            onClearInputClicked = component::clearInput,
-            onLocationClicked = component::navigateToLocationWeather,
-            onCancelClicked = component::navigateBack
+            component = component,
+            modifier = modifier
         )
 
         ChildPagesModalBottomSheet(
@@ -85,14 +74,11 @@ fun LocationSearchScreen(
 
 @Composable
 private fun ScreenContent(
-    screenState: State<LocationSearchUiState>,
-    inputState: State<String>,
+    component: LocationSearchComponent,
     modifier: Modifier = Modifier,
-    onSearchInputChanged: (String) -> Unit,
-    onClearInputClicked: () -> Unit,
-    onLocationClicked: (LocationInfoShort) -> Unit,
-    onCancelClicked: () -> Unit,
 ) {
+    val screenState = component.uiState.collectAsState()
+    val inputState = component.inputText.collectAsState()
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -113,7 +99,7 @@ private fun ScreenContent(
         ) {
             SearchTextField(
                 value = inputState.value,
-                onValueChange = onSearchInputChanged,
+                onValueChange = component::updateInput,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = MeteoraTheme.dimen.horizontalPadding),
@@ -130,7 +116,7 @@ private fun ScreenContent(
                         Icon(
                             imageVector = MeteoraIcons.XCircle,
                             contentDescription = "Clear",
-                            modifier = Modifier.clickable(onClick = onClearInputClicked),
+                            modifier = Modifier.clickable(onClick = component::clearInput),
                             tint = MeteoraColor.White50
                         )
                     }
@@ -146,7 +132,7 @@ private fun ScreenContent(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = onCancelClicked
+                        onClick = component::navigateBack
                     ),
                 style = MaterialTheme.typography.bodyLarge
             )
@@ -179,7 +165,10 @@ private fun ScreenContent(
             }
 
             is LocationSearchUiState.Content -> {
-                SearchResultList(items = searchState.locations, onItemClicked = onLocationClicked)
+                SearchResultList(
+                    items = searchState.locations,
+                    onItemClicked = component::navigateToLocationWeather
+                )
             }
         }
     }
@@ -214,37 +203,8 @@ private fun SearchResultList(
 
 @Preview
 @Composable
-private fun PreviewLocationSearchContentScreen() {
+private fun LocationSearchScreenPreview() {
     MeteoraTheme {
-        val screenState = remember {
-            mutableStateOf(LocationSearchUiState.Idle)
-        }
-        val inputState = remember {
-            mutableStateOf("")
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF8780A3),
-                            Color(0xFFaeaabf)
-                        )
-                    )
-                ),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            PreviewSharedLayout {
-                ScreenContent(
-                    screenState = screenState,
-                    inputState = inputState,
-                    onSearchInputChanged = {},
-                    onClearInputClicked = {},
-                    onLocationClicked = {},
-                    onCancelClicked = {}
-                )
-            }
-        }
+        LocationSearchScreen(PreviewLocationSearchComponent())
     }
 }

@@ -1,4 +1,4 @@
-package org.meteora.presentation.decompose
+package org.meteora.presentation.screen.locationsearch.component
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.pages.ChildPages
@@ -15,28 +15,13 @@ import org.koin.core.component.get
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.entity.LocationInfoShort
 import org.meteora.domain.repository.WeatherApiRepository
+import org.meteora.presentation.screen.locationweathersheet.component.DefaultLocationWeatherSheetComponent
 import org.meteora.presentation.decompose.bottomsheet.BottomSheetContentComponent
 import org.meteora.presentation.decompose.bottomsheet.pages.navigation.bottomSheetPages
 import org.meteora.presentation.decompose.bottomsheet.pages.navigation.pop
 import org.meteora.presentation.decompose.bottomsheet.pages.navigation.pushNew
+import org.meteora.presentation.screen.locationsearch.LocationSearchUiState
 import org.meteora.util.coroutineScope
-
-interface LocationSearchComponent {
-    val uiState: StateFlow<LocationSearchUiState>
-    val bottomSheetPages: Value<ChildPages<*, BottomSheetContentComponent>>
-
-    val inputText: StateFlow<String>
-
-    fun updateInput(input: String)
-
-    fun clearInput()
-
-    fun navigateToLocationWeather(location: LocationInfoShort)
-
-    fun navigateBack()
-
-    fun dismissBottomSheet()
-}
 
 class DefaultLocationSearchComponent(
     componentContext: ComponentContext,
@@ -48,6 +33,7 @@ class DefaultLocationSearchComponent(
     private val coroutineScope = coroutineScope()
 
     private val _uiState = MutableStateFlow<LocationSearchUiState>(LocationSearchUiState.Idle)
+
     override val uiState: StateFlow<LocationSearchUiState> = _uiState
 
     private val bottomSheetPagesNavigation = PagesNavigation<SearchBottomSheetConfig>()
@@ -145,12 +131,4 @@ class DefaultLocationSearchComponent(
         @Serializable
         data class LocationWeather(val locationInfo: LocationInfo) : SearchBottomSheetConfig()
     }
-}
-
-sealed class LocationSearchUiState {
-    object Idle : LocationSearchUiState()
-    object Loading : LocationSearchUiState()
-    object NoResult : LocationSearchUiState()
-    data class Content(val locations: List<LocationInfoShort>) : LocationSearchUiState()
-    data class Error(val throwable: Throwable) : LocationSearchUiState()
 }

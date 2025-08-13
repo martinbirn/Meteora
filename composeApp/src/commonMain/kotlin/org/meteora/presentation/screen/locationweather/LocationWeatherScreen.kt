@@ -30,39 +30,32 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import dev.icerock.moko.geo.LocationTracker
 import dev.icerock.moko.geo.compose.BindLocationTrackerEffect
 import dev.icerock.moko.geo.compose.LocationTrackerAccuracy
-import dev.icerock.moko.geo.compose.LocationTrackerFactory
 import dev.icerock.moko.geo.compose.rememberLocationTrackerFactory
-import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
-import dev.icerock.moko.permissions.compose.PermissionsControllerFactory
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.meteora.domain.entity.WeatherInfo
-import org.meteora.presentation.decompose.LocationWeatherComponent
-import org.meteora.presentation.decompose.LocationWeatherUiState
-import org.meteora.presentation.screen.locationweather.component.DailyForecastCard
-import org.meteora.presentation.screen.locationweather.component.FeelsLikeCard
-import org.meteora.presentation.screen.locationweather.component.HourlyForecastCard
-import org.meteora.presentation.screen.locationweather.component.HumidityCard
-import org.meteora.presentation.screen.locationweather.component.PrecipitationCard
-import org.meteora.presentation.screen.locationweather.component.SunCard
-import org.meteora.presentation.screen.locationweather.component.UvIndexCard
-import org.meteora.presentation.screen.locationweather.component.VisibilityCard
-import org.meteora.presentation.screen.locationweather.component.WindCard
+import org.meteora.presentation.component.weather.DailyForecastCard
+import org.meteora.presentation.component.weather.FeelsLikeCard
+import org.meteora.presentation.component.weather.HourlyForecastCard
+import org.meteora.presentation.component.weather.HumidityCard
+import org.meteora.presentation.component.weather.PrecipitationCard
+import org.meteora.presentation.component.weather.SunCard
+import org.meteora.presentation.component.weather.UvIndexCard
+import org.meteora.presentation.component.weather.VisibilityCard
+import org.meteora.presentation.component.weather.WindCard
+import org.meteora.presentation.screen.locationweather.component.LocationWeatherComponent
+import org.meteora.presentation.screen.locationweather.component.PreviewLocationWeatherComponent
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.description
-import org.meteora.presentation.util.preview.WeatherInfoParameters
 
 enum class WeatherSection {
     HOURLIES, DAILIES, FEELS_LIKE, UV_INDEX, WIND, SUN, PRECIPITATION, VISIBILITY, HUMIDITY,
@@ -75,14 +68,12 @@ fun LocationWeatherScreen(
     header: @Composable () -> Unit = {}
 ) {
     if (component.initialLocation == null) {
-        val permissionFactory: PermissionsControllerFactory = rememberPermissionsControllerFactory()
-        val permissionsController: PermissionsController = remember(permissionFactory) {
+        val permissionFactory = rememberPermissionsControllerFactory()
+        val permissionsController = remember(permissionFactory) {
             permissionFactory.createPermissionsController()
         }
-        val locationTrackerFactory: LocationTrackerFactory = rememberLocationTrackerFactory(
-            LocationTrackerAccuracy.Best
-        )
-        val locationTracker: LocationTracker = remember(locationTrackerFactory) {
+        val locationTrackerFactory = rememberLocationTrackerFactory(LocationTrackerAccuracy.Best)
+        val locationTracker = remember(locationTrackerFactory) {
             locationTrackerFactory.createLocationTracker(permissionsController)
         }
 
@@ -115,27 +106,25 @@ fun LocationWeatherScreen(
                     )
                 )
             )
-            //.systemBarsPadding()
             .statusBarsPadding()
             .padding(
                 start = MeteoraTheme.dimen.horizontalPadding,
-                top = MeteoraTheme.dimen.verticalPadding,
                 end = MeteoraTheme.dimen.horizontalPadding
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         header()
-        val screenState by component.weatherState.collectAsState()
         LocationWeatherScreenContent(
-            screenState = screenState
+            component = component
         )
     }
 }
 
 @Composable
 private fun LocationWeatherScreenContent(
-    screenState: LocationWeatherUiState
+    component: LocationWeatherComponent
 ) {
+    val screenState by component.weatherState.collectAsState()
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val size = with(density) { windowInfo.containerSize.toSize().toDpSize() }
@@ -277,34 +266,8 @@ private fun LocationWeatherScreenContent(
 
 @Preview
 @Composable
-private fun PreviewLocationWeatherScreenContent(
-    // @PreviewParameter is broken on my AS version (https://youtrack.jetbrains.com/issue/KMT-879)
-    // @PreviewParameter(WeatherInfoParameters::class)
-    weatherInfo: WeatherInfo = WeatherInfoParameters().values.first()
-) {
+private fun LocationWeatherScreenPreview() {
     MeteoraTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF8780A3),
-                            Color(0xFFaeaabf)
-                        )
-                    )
-                )
-                .padding(
-                    horizontal = MeteoraTheme.dimen.horizontalPadding,
-                    vertical = MeteoraTheme.dimen.verticalPadding
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LocationWeatherScreenContent(
-                screenState = LocationWeatherUiState.Content(
-                    weatherInfo = weatherInfo
-                )
-            )
-        }
+        LocationWeatherScreen(PreviewLocationWeatherComponent())
     }
 }

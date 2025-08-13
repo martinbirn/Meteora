@@ -1,4 +1,4 @@
-package org.meteora.presentation.decompose
+package org.meteora.presentation.screen.locationweathersheet.component
 
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -6,19 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 import org.meteora.domain.entity.LocationInfo
 import org.meteora.domain.repository.WeatherApiRepository
 import org.meteora.domain.repository.WeatherLocalRepository
-import org.meteora.presentation.decompose.bottomsheet.BottomSheetContentComponent
 import org.meteora.presentation.decompose.bottomsheet.BottomSheetContentState
-
-interface LocationWeatherSheetComponent : BottomSheetContentComponent {
-    val state: StateFlow<LocationWeatherSheet>
-    val weatherComponent: LocationWeatherComponent
-    val locationInfo: LocationInfo
-
-    fun navigateBack()
-
-    // Add the selected location to the local repository
-    fun addLocation(locationInfo: LocationInfo)
-}
+import org.meteora.presentation.screen.locationweather.component.DefaultLocationWeatherComponent
+import org.meteora.presentation.screen.locationweathersheet.LocationWeatherSheetUiState
 
 class DefaultLocationWeatherSheetComponent(
     componentContext: ComponentContext,
@@ -30,10 +20,10 @@ class DefaultLocationWeatherSheetComponent(
 ) : LocationWeatherSheetComponent, ComponentContext by componentContext {
 
     private val _state = MutableStateFlow(
-        LocationWeatherSheet(isDismissAllowed = true)
+        LocationWeatherSheetUiState(isDismissAllowed = true)
     )
 
-    override val state: StateFlow<LocationWeatherSheet> = _state
+    override val state: StateFlow<LocationWeatherSheetUiState> = _state
 
     override val bottomSheetContentState: StateFlow<BottomSheetContentState> = state
 
@@ -53,7 +43,3 @@ class DefaultLocationWeatherSheetComponent(
         onAddLocation()
     }
 }
-
-data class LocationWeatherSheet(
-    override val isDismissAllowed: Boolean,
-) : BottomSheetContentState

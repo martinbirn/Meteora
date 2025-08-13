@@ -1,4 +1,4 @@
-package org.meteora.presentation.screen.locationweather.component
+package org.meteora.presentation.component.weather
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
@@ -18,14 +18,15 @@ import org.meteora.domain.entity.WeatherInfo
 import org.meteora.presentation.icon.Droplet
 import org.meteora.presentation.icon.MeteoraIcons
 import org.meteora.presentation.resources.Res
-import org.meteora.presentation.resources.humidity
+import org.meteora.presentation.resources.precipitation
+import org.meteora.presentation.resources.today
 import org.meteora.presentation.theme.MeteoraColor
 import org.meteora.presentation.theme.MeteoraTheme
 import org.meteora.presentation.util.preview.WeatherInfoParameters
 
 @Composable
-fun HumidityCard(
-    humidity: Int,
+fun PrecipitationCard(
+    precipitation: Int,
     modifier: Modifier = Modifier
 ) {
     SquareContainer(modifier = modifier) {
@@ -39,7 +40,7 @@ fun HumidityCard(
             )
             Spacer(modifier = Modifier.width(width = 4.dp))
             Text(
-                text = stringResource(resource = Res.string.humidity),
+                text = stringResource(resource = Res.string.precipitation),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MeteoraColor.White30
                 )
@@ -47,12 +48,16 @@ fun HumidityCard(
         }
         Spacer(modifier = Modifier.height(height = 12.dp))
         Text(
-            text = "$humidity%",
+            text = "$precipitation mm",
             style = MaterialTheme.typography.displaySmall
+        )
+        Text(
+            text = stringResource(Res.string.today),
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.weight(weight = 1f))
         Text(
-            text = "The dew point is 1° right now",
+            text = "Next expected is 2 mm on Sat",
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MeteoraColor.White
             )
@@ -62,14 +67,14 @@ fun HumidityCard(
 
 @Preview
 @Composable
-private fun PreviewHumidityCard(
+private fun PreviewPrecipitationCard(
     // @PreviewParameter is broken on my AS version (https://youtrack.jetbrains.com/issue/KMT-879)
     // @PreviewParameter(WeatherInfoParameters::class)
     weatherInfo: WeatherInfo = WeatherInfoParameters().values.first()
 ) {
     MeteoraTheme {
-        HumidityCard(
-            humidity = weatherInfo.main.humidity,
+        PrecipitationCard(
+            precipitation = weatherInfo.precipitation.toInt(),
             modifier = Modifier.width(width = 200.dp)
         )
     }
